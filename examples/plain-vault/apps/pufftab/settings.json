@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "dailyGramLimit": 1.0,
+  "enableDailyLimit": true,
+  "weeklyGramLimit": 7.0,
+  "monthlyBudget": 300.0,
+  "preferredThcRange": "15-25",
+  "preferredCbdRange": "0-5",
+  "enableNotifications": true,
+  "enableLowSupplyAlerts": true,
+  "privacyMode": false,
+  "defaultMethod": "Joint",
+  "trackSleepQuality": false,
+  "trackMoodChanges": false,
+  "trackPuffLocation": true,
+  "puffTrackingEnabled": true,
+  "accentColorName": "evergreen",
+  "compressImages": true,
+  "imageCompressionQuality": 0.8,
+  "maxImageDimension": 1920,
+  "enableGreenHours": true,
+  "greenHoursStart": "16:20",
+  "greenHoursEnd": "21:30",
+  "enableGreenHoursNotifications": true,
+  "greenHoursSchedule": {
+    "1": {
+      "enabled": false,
+      "start": "16:20",
+      "end": "21:30"
+    },
+    "6": {
+      "enabled": true,
+      "start": "12:00",
+      "end": "23:00"
+    },
+    "7": {
+      "enabled": true,
+      "start": "12:00",
+      "end": "23:00"
+    }
+  },
+  "legacyTaxRate": 0.0,
+  "enableTaxes": true
+}

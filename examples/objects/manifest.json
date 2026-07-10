@@ -1,0 +1,10 @@
+{
+  "format": "canpuff",
+  "specVersion": 1,
+  "vaultId": "1de2c1a7-4d3e-4a2b-9e6f-8b7a5c4d3e2f",
+  "created": "2026-07-10T09:00:00-07:00",
+  "generator": {
+    "name": "canpuff-spec-examples",
+    "version": "1.0"
+  }
+}

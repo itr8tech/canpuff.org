@@ -1,0 +1,11 @@
+---
+type: terpene
+version: 1
+id: d4e5f6a7-b8c9-4d0e-af1b-2c3d4e5f6a7b
+name: Myrcene
+aroma: "earthy, musky, clove"
+commonEffects: "sedating, relaxing"
+boilingPointC: 166.7
+---
+
+Most abundant terpene in modern cannabis; also in hops and mango.

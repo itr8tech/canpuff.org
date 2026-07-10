@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://canpuff.org/schemas/v1/manifest.json",
+  "title": "CanPUFF vault manifest v1",
+  "type": "object",
+  "properties": {
+    "format": {
+      "const": "canpuff"
+    },
+    "specVersion": {
+      "const": 1
+    },
+    "vaultId": {
+      "$ref": "#/$defs/uuid"
+    },
+    "created": {
+      "$ref": "#/$defs/timestamp"
+    },
+    "generator": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "required": [
+    "format",
+    "specVersion",
+    "vaultId"
+  ],
+  "$defs": {
+    "uuid": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?(Z|[+-]\\d{2}:\\d{2})$",
+      "description": "RFC 3339 with UTC offset (Z acceptable)"
+    }
+  }
+}

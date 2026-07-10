@@ -1,0 +1,28 @@
+{
+  "type": "consumption",
+  "version": 1,
+  "id": "7c9e6679-7425-40de-944b-e07fc1f90ae7",
+  "at": "2026-07-09T16:20:00.000-07:00",
+  "supply": "9f3c1a2e-7b41-4c8e-9d2a-51f08c77b3aa",
+  "method": "b6b8f3a1-2c4d-4e5f-8a9b-0c1d2e3f4a5b",
+  "amount": {
+    "grams": 0.35
+  },
+  "shared": {
+    "people": 2,
+    "gift": false
+  },
+  "effects": {
+    "rating": 7,
+    "sideEffects": "dry mouth"
+  },
+  "context": {
+    "purpose": "wind down",
+    "location": {
+      "name": "back porch",
+      "lat": 49.2827,
+      "lon": -123.1207
+    }
+  },
+  "notes": "Paired with a movie."
+}

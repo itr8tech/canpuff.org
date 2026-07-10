@@ -1,0 +1,14 @@
+{
+  "type": "producer",
+  "version": 1,
+  "id": "c1a2b3c4-d5e6-4f7a-8b9c-0d1e2f3a4b5c",
+  "name": "Pure Sunfarms",
+  "legalName": "Pure Sunfarms Corp.",
+  "licenseNumber": "LIC-XXXX-2018",
+  "website": "https://puresunfarms.com",
+  "headquarters": "Delta, BC",
+  "yearFounded": 2017,
+  "active": true,
+  "rating": 4,
+  "notes": "Big BC greenhouse producer. Consistent."
+}

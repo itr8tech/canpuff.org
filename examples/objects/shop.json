@@ -1,0 +1,21 @@
+{
+  "type": "shop",
+  "version": 1,
+  "id": "2b3c4d5e-6f7a-4b8c-9d0e-1f2a3b4c5d6e",
+  "name": "Commercial Drive",
+  "city": "Vancouver",
+  "address": "1234 Commercial Dr",
+  "lat": 49.2699,
+  "lon": -123.0697,
+  "phone": "+1-604-555-0142",
+  "email": "commercial@buddys.example",
+  "website": "https://buddys.example/commercial",
+  "orderingUrl": "https://buddys.example/order",
+  "delivery": true,
+  "chain": "e7f8a9b0-c1d2-4e3f-a4b5-c6d7e8f9a0b1",
+  "customerId": "BUD-42137-CD",
+  "rating": 5,
+  "created": "2026-06-01T10:00:00.000-07:00",
+  "updated": "2026-07-02T18:00:00.000-07:00",
+  "notes": "Ask for Sam. Good rotation of BC craft."
+}
