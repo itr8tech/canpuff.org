@@ -21,7 +21,7 @@ try:
 except ImportError:
     sys.exit("validate-vault.py requires: pip install jsonschema pyyaml")
 
-SCHEMA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "schemas")
+SCHEMA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "schemas", "v1")
 
 TYPE_TO_DIR = {
     "supply": "supplies", "shop": "shops", "chain": "chains", "brand": "brands",
@@ -45,9 +45,9 @@ def warn(msg: str) -> None:
 def load_schemas() -> dict:
     schemas = {}
     for name in os.listdir(SCHEMA_DIR):
-        if name.endswith(".schema.json"):
+        if name.endswith(".json"):
             with open(os.path.join(SCHEMA_DIR, name)) as f:
-                schemas[name.removesuffix(".schema.json")] = json.load(f)
+                schemas[name.removesuffix(".json")] = json.load(f)
     return schemas
 
 

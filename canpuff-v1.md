@@ -47,7 +47,7 @@ Additionally:
 - `created` and `updated` (RFC 3339) are OPTIONAL on every object; writers that edit records SHOULD maintain `updated`.
 - **Unknown fields:** readers MUST ignore fields they do not recognize. Writers that modify a record they did not fully author MUST preserve `ext` content (§9.1) and SHOULD preserve other unrecognized fields on write-back.
 - **References** between objects are by `id`. Readers MUST tolerate dangling references (the referenced record may not have synced yet or may have been deleted) and treat them as "unknown," not as errors.
-- **Tombstones:** a deleted object MAY be represented by a tombstone — the object reduced to exactly `{ "type", "version", "id", "deleted": true, "updated" }` (with `updated` set to the deletion time). Readers MUST treat a record carrying `deleted: true` as a deletion marker for that id, regardless of type. Tombstones participate in import merging (§8) and validate against `schemas/tombstone.schema.json` rather than their type's schema. Writers SHOULD retain tombstones (they are what prevents deleted records from resurrecting on import of older exports).
+- **Tombstones:** a deleted object MAY be represented by a tombstone — the object reduced to exactly `{ "type", "version", "id", "deleted": true, "updated" }` (with `updated` set to the deletion time). Readers MUST treat a record carrying `deleted: true` as a deletion marker for that id, regardless of type. Tombstones participate in import merging (§8) and validate against `schemas/v1/tombstone.json` rather than their type's schema. Writers SHOULD retain tombstones (they are what prevents deleted records from resurrecting on import of older exports).
 
 ## 3. The plain vault
 
