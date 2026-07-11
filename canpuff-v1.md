@@ -154,6 +154,8 @@ else:
 
 If the event has no `supply` field, or the referenced supply cannot be resolved, `sharedSupply` is treated as `false` for this computation. If `amount` is absent, the event records that consumption occurred but contributes 0 grams to both user-consumption and stash-depletion math.
 
+Implementations MAY compute in IEEE-754 binary floating point or in decimal arithmetic; "identically" is defined at spec precision — two implementations' results MUST agree when rounded half-even to 4 decimal places of grams.
+
 Rationale: for the user's own supply, a gifted amount left their stash but not through their lungs; for a friend's supply marked `sharedSupply`, a "gift" flows the other way. Stash depletion, by contrast, is always `amount.grams` against the referenced supply.
 
 #### 4.1.2 Standard THC units (derived)
