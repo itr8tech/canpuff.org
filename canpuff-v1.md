@@ -24,7 +24,7 @@ Every record belongs to exactly one of two tiers, and the tier determines its pr
 | Tier | Contains | Representation | Privacy posture |
 |---|---|---|---|
 | **Journal** | Events: what was consumed, when, how much, by/with whom, to what effect | JSON Lines (`.jsonl`), append-oriented | **Private.** MUST NOT leave a trusted device unencrypted (see Sealed profile). |
-| **Catalog** | Documents: supplies (stash items), shops, chains, brands, producers, methods, tax rates, terpene notes | One Markdown file with YAML frontmatter per record (`.md`) | **Shareable.** Contains no information about the user's behavior. Plaintext by default. |
+| **Catalog** | Documents: supplies (what's on hand), shops, chains, brands, producers, methods, tax rates, terpene notes | One Markdown file with YAML frontmatter per record (`.md`) | **Shareable.** Contains no information about the user's behavior. Plaintext by default. |
 
 Sharing features (QR cards, exports to friends, any future federation) MUST only ever transmit catalog records and their referenced attachments — never journal records. An object of a type the reader does not recognize MUST be treated as journal-tier for all privacy rules unless it was read from a vault's `catalog/` directory; sharing features MUST NOT transmit objects of unrecognized type.
 
@@ -137,7 +137,7 @@ One consumption event. All fields except the common trio and `at` are OPTIONAL; 
 | `photo` | hash-ref | Attachment reference (§7). |
 | `notes` | string | Free text. |
 
-**Writer behavior — stash depletion:** a writer that creates a consumption event referencing a supply it manages SHOULD decrement that supply's `grams` by `amount.grams` (floored at 0) in the same logical operation, update the supply's `updated`, and SHOULD reverse/adjust the decrement when the event is edited or deleted. Supplies with `sharedSupply: true` are application-managed (the stash is not the user's) and SHOULD NOT be decremented by default. `supply.grams` remains authoritative thereafter (§5.1); applications MUST NOT recompute it from the journal except as an explicitly user-invoked repair.
+**Writer behavior — supply depletion:** a writer that creates a consumption event referencing a supply it manages SHOULD decrement that supply's `grams` by `amount.grams` (floored at 0) in the same logical operation, update the supply's `updated`, and SHOULD reverse/adjust the decrement when the event is edited or deleted. Supplies with `sharedSupply: true` are application-managed (the supply is not the user's) and SHOULD NOT be decremented by default. `supply.grams` remains authoritative thereafter (§5.1); applications MUST NOT recompute it from the journal except as an explicitly user-invoked repair.
 
 #### 4.1.1 Consumption math (normative)
 
@@ -152,11 +152,11 @@ else:
     userGrams = amount.grams / persons
 ```
 
-If the event has no `supply` field, or the referenced supply cannot be resolved, `sharedSupply` is treated as `false` for this computation. If `amount` is absent, the event records that consumption occurred but contributes 0 grams to both user-consumption and stash-depletion math.
+If the event has no `supply` field, or the referenced supply cannot be resolved, `sharedSupply` is treated as `false` for this computation. If `amount` is absent, the event records that consumption occurred but contributes 0 grams to both user-consumption and supply-depletion math.
 
 Implementations MAY compute in IEEE-754 binary floating point or in decimal arithmetic; "identically" is defined at spec precision — two implementations' results MUST agree when rounded half-even to 4 decimal places of grams.
 
-Rationale: for the user's own supply, a gifted amount left their stash but not through their lungs; for a friend's supply marked `sharedSupply`, a "gift" flows the other way. Stash depletion, by contrast, is always `amount.grams` against the referenced supply.
+Rationale: for the user's own supply, a gifted amount left their supply but not through their lungs; for a friend's supply marked `sharedSupply`, a "gift" flows the other way. Supply depletion, by contrast, is always `amount.grams` against the referenced supply.
 
 #### 4.1.2 Standard THC units (derived)
 
@@ -170,7 +170,7 @@ This value is derived and MUST NOT be stored as an authoritative field.
 
 ### 4.2 Other journal event types
 
-This version defines only `consumption`. Applications needing additional event kinds (e.g. stash adjustments, tolerance-break markers) MUST use extension types (§9.1) until they are standardized.
+This version defines only `consumption`. Applications needing additional event kinds (e.g. supply adjustments, tolerance-break markers) MUST use extension types (§9.1) until they are standardized.
 
 ## 5. The catalog
 
@@ -191,7 +191,7 @@ Catalog records are documents. In the vault they are stored as **Markdown files 
 
 This set is closed for spec v1: extension catalog record types are not permitted under `catalog/` — applications needing new document kinds MUST use `apps/<app-id>/` (§9.2) until the type is standardized. Readers MUST tolerate (and preserve) unknown directories under `catalog/` without interpreting them.
 
-### 5.1 `supply` — a stash item
+### 5.1 `supply` — a package on hand
 
 A purchased (or received) package of product.
 
@@ -213,9 +213,9 @@ A purchased (or received) package of product.
 | `rating` | integer 0–5 | 0 = unrated. |
 | `photo` | hash-ref | |
 | `lowThreshold` | grams | Low-supply warning level. |
-| `finished` | boolean | No longer in the stash. `finishedAt`: timestamp. |
+| `finished` | boolean | No longer on hand. `finishedAt`: timestamp. |
 | `favorite` | boolean | |
-| `sharedSupply` | boolean | This is someone else's stash the user partakes from. Inverts gift math (§4.1.1). Default false. |
+| `sharedSupply` | boolean | This is someone else's supply the user partakes from. Inverts gift math (§4.1.1). Default false. |
 | `notes` | string | In the Markdown form, this is the document body. |
 
 Derived values (`costPerGram = cost / gramsStart`, cost with taxes, freshness) MUST NOT be stored; the formulas above and the referenced `tax-rate` records make them reproducible.

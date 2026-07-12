@@ -2,7 +2,7 @@
   "verdict": "PASS",
   "errors": [],
   "warnings": [
-    "journal/2026/06.jsonl:2: unrecognized journal type 'stash-note' (tolerated)",
+    "journal/2026/06.jsonl:2: unrecognized journal type 'misc-note' (tolerated)",
     "catalog/reviews/: unknown catalog directory (tolerated, not interpreted)"
   ]
 }
