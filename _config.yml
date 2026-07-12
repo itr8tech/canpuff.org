@@ -1,0 +1,9 @@
+# canpuff.org — GitHub Pages (Jekyll) configuration.
+#
+# The conformance fixtures include deliberately malformed catalog files
+# (unterminated / non-mapping YAML front matter) that MUST NOT be fed to
+# Jekyll's front-matter parser — they fail the site build by design of
+# what they test. Fixtures are distributed via the git repository, not
+# the rendered site.
+exclude:
+  - fixtures/
