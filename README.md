@@ -1,6 +1,6 @@
 # CanPUFF — Cannabis Personal Use File Format
 
-**Version 1.0 — DRAFT r2 (July 2026)** · r2 incorporates a five-lens adversarial review (83 findings: normative-language audit, lossless-mapping audit against the iOS source, cryptography/protocol audit, clean-room implementer walkthrough, and spec/schema/example cross-check).
+**Version 1.0-rc (July 2026)** · the core format is **frozen as a release candidate**, standing on a five-lens adversarial review (83 findings applied) and a proven lossless round-trip of real data — 1,752 records, 239 photos — between two independent implementations.
 
 CanPUFF is an open, documented file format for **personal cannabis consumption records** — the data an individual creates when they track what they consume, what they have, where they got it, and how it affected them.
 
@@ -12,13 +12,13 @@ It is a format for *people*, not businesses. Seed-to-sale systems, dispensary po
 
 | Document | Status | What it defines |
 |---|---|---|
-| [`canpuff-v1.md`](canpuff-v1.md) | Draft | **The core format**: the vault layout, the journal (JSONL events), the catalog (Markdown + frontmatter cards), attachments, identifiers, units, and the extension mechanism. |
+| [`canpuff-v1.md`](canpuff-v1.md) | **1.0-rc** | **The core format**: the vault layout, the journal (JSONL events), the catalog (Markdown + frontmatter cards), attachments, identifiers, units, and the extension mechanism. |
 | [`canpuff-sealed-v1.md`](canpuff-sealed-v1.md) | Draft | **The sealed vault profile**: end-to-end encryption (age v1), the key hierarchy (BIP39 mnemonic root), and the synchronization repository layout + protocol for dumb file servers. |
 | [`mapping-pufftab-ios.md`](mapping-pufftab-ios.md) | Draft | **Lossless mapping** from the PuffTab iOS app's data model (the first implementation) to CanPUFF, field by field. |
-| [`schemas/`](schemas/) | Draft | JSON Schema (2020-12) for every object type. The schemas are normative for the JSON form. |
-| [`examples/`](examples/) | Draft | A complete example plain vault, plus standalone JSON objects that validate against the schemas. |
-| [`fixtures/`](fixtures/) | Draft | **Conformance fixtures**: edge-heavy valid vaults and deliberately broken ones, each with the reference validator's expected verdict, plus a runner. What makes a third-party implementation testable. |
-| [`tools/`](tools/) | Draft | **Reference tooling**, standalone Python: `validate-vault.py` (conformance) and `diff-vaults.py` (semantic equivalence of two vaults — round-trip verification). Both accept a vault directory or a `.canpuff.zip`. |
+| [`schemas/`](schemas/) | 1.0-rc | JSON Schema (2020-12) for every object type. The schemas are normative for the JSON form. |
+| [`examples/`](examples/) | 1.0-rc | A complete example plain vault, plus standalone JSON objects that validate against the schemas. |
+| [`fixtures/`](fixtures/) | 1.0-rc | **Conformance fixtures**: edge-heavy valid vaults and deliberately broken ones, each with the reference validator's expected verdict, plus a runner. What makes a third-party implementation testable. |
+| [`tools/`](tools/) | 1.0-rc | **Reference tooling**, standalone Python: `validate-vault.py` (conformance) and `diff-vaults.py` (semantic equivalence of two vaults — round-trip verification). Both accept a vault directory or a `.canpuff.zip`. |
 
 ## Design principles
 
@@ -32,6 +32,6 @@ It is a format for *people*, not businesses. Seed-to-sale systems, dispensary po
 
 ## Status & governance
 
-This is a v1 **draft** under active development. The spec text and schemas are published under **CC0-1.0**, with an OWFa 1.0 patent non-assertion covering implementations. Two reference implementations are planned to ship with v1.0 final: the PuffTab iOS exporter and the PuffTab web app (import/export).
+The core format is a **v1.0 release candidate**: frozen, with breaking changes now requiring a demonstrated interoperability failure; additive proposals target v1.1 per the versioning rules (Core §10). The sealed profile remains a draft under active development. The spec text and schemas are published under **CC0-1.0**, with an OWFa 1.0 patent non-assertion covering implementations. Two reference implementations exist and round-trip real data losslessly: the PuffTab iOS app (export/import) and the PuffTab web app (import/export); v1.0 **final** follows validation of the sealed profile.
 
 Feedback, implementations, and proposals are welcome — the extension mechanism is the intended first stop for new needs; fields that prove themselves in `ext` are candidates for the next minor version.

@@ -1,6 +1,6 @@
 # CanPUFF: Cannabis Personal Use File Format — Core Specification
 
-**Version 1.0 — DRAFT r2 (2026-07-10)**
+**Version 1.0-rc (2026-07-11)** — the core format is frozen as a release candidate.
 **Media type:** `application/canpuff+json` · **Format identifier:** `canpuff`
 **License:** spec text and schemas CC0-1.0; OWFa 1.0 patent non-assert.
 
