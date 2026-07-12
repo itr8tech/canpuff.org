@@ -1,0 +1,10 @@
+{
+  "format": "canpuff",
+  "specVersion": 1,
+  "vaultId": "00000004-0000-4000-8000-000000000000",
+  "created": "2026-07-11T09:00:00-07:00",
+  "generator": {
+    "name": "canpuff-fixtures",
+    "version": "1"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "verdict": "FAIL",
+  "errors": [
+    "journal/2026/06.jsonl:1: event dated 2026-05-30 belongs in journal/2026/05.jsonl (Core §3)",
+    "journal/2026/7.jsonl: journal files must be journal/<YYYY>/<MM>.jsonl with zero-padded month",
+    "journal/2026/7.jsonl:1: event dated 2026-07-01 belongs in journal/2026/07.jsonl (Core §3)",
+    "catalog/methods/0000000a-0000-4000-8000-0000000000ee.md: filename must be <id>.md",
+    "catalog/shops/0000000a-0000-4000-8000-000000000003.md: type 'brand' in directory for 'shop' (type is authoritative; writers must place records correctly)"
+  ],
+  "warnings": []
+}

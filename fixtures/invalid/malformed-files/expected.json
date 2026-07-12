@@ -1,0 +1,13 @@
+{
+  "verdict": "FAIL",
+  "errors": [
+    "journal/2026/06.jsonl:2: unparseable JSONL line",
+    "catalog/supplies/0000000b-0000-4000-8000-000000000002.md: file must begin with a '---' line",
+    "catalog/supplies/0000000b-0000-4000-8000-000000000003.md: unterminated frontmatter",
+    "catalog/supplies/0000000b-0000-4000-8000-000000000004.md: frontmatter must be a mapping",
+    "catalog/supplies/0000000b-0000-4000-8000-000000000005.md: notes must be absent rather than empty (Core §6.2)"
+  ],
+  "warnings": [
+    "catalog/supplies/readme.txt: non-.md file in catalog"
+  ]
+}

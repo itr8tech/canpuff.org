@@ -1,0 +1,7 @@
+{
+  "verdict": "FAIL",
+  "errors": [
+    "manifest.json missing — not a CanPUFF vault (Core §3.1)"
+  ],
+  "warnings": []
+}

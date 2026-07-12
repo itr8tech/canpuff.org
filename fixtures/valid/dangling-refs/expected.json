@@ -1,0 +1,13 @@
+{
+  "verdict": "PASS",
+  "errors": [],
+  "warnings": [
+    "journal/2026/06.jsonl:1: dangling supply reference 00000003-0000-4000-8000-0000000000f5 (tolerated by Core §2)",
+    "journal/2026/06.jsonl:1: dangling method reference 00000003-0000-4000-8000-0000000000f6 (tolerated by Core §2)",
+    "catalog/supplies/00000003-0000-4000-8000-000000000001.md: dangling shop reference 00000003-0000-4000-8000-0000000000f2 (tolerated by Core §2)",
+    "catalog/supplies/00000003-0000-4000-8000-000000000001.md: dangling brand reference 00000003-0000-4000-8000-0000000000f1 (tolerated by Core §2)",
+    "catalog/supplies/00000003-0000-4000-8000-000000000001.md: dangling taxes reference 00000003-0000-4000-8000-0000000000f3 (tolerated by Core §2)",
+    "catalog/supplies/00000003-0000-4000-8000-000000000001.md: dangling taxes reference 00000003-0000-4000-8000-0000000000f4 (tolerated by Core §2)",
+    "attachment reference sha256:deadbeefdead… has no file (dangling; tolerated)"
+  ]
+}

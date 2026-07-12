@@ -1,0 +1,2 @@
+{"type":"consumption","version":1,"id":"00000002-0000-4000-8000-000000000004","at":"2026-06-05T16:20:00-07:00","supply":"00000002-0000-4000-8000-000000000002","amount":{"grams":0.25},"notes":"Logged before the supply record was deleted; the reference now resolves to a tombstone."}
+{"type":"consumption","version":1,"id":"00000002-0000-4000-8000-000000000003","deleted":true,"updated":"2026-06-07T08:00:00-07:00"}

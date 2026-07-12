@@ -1,7 +1,16 @@
 #!/usr/bin/env python3
 """CanPUFF v1 plain-vault validator.
 
-Usage:  validate-vault.py <vault-directory>
+Usage:  validate-vault.py <vault>
+        <vault> is a plain-vault directory, or a zipped vault (.canpuff.zip,
+        Core §8 — the manifest at the archive root, or inside a sole
+        top-level directory).
+
+Exit codes:
+        0  the vault conforms (warnings, if any, are printed)
+        1  conformance errors found
+        2  usage or environment error (bad arguments, missing dependencies)
+
 Needs:  pip install jsonschema pyyaml
 
 Checks a vault against the CanPUFF Core v1 spec: manifest, journal files,
@@ -9,17 +18,21 @@ catalog Markdown round-trip rules, attachment content-addressing, and
 referential integrity. Errors are conformance failures; warnings are
 spec-tolerated conditions worth surfacing (dangling refs, unknown types).
 """
+import contextlib
 import hashlib
 import json
 import os
 import re
 import sys
+import tempfile
+import zipfile
 
 try:
     import jsonschema
     import yaml
 except ImportError:
-    sys.exit("validate-vault.py requires: pip install jsonschema pyyaml")
+    print("validate-vault.py requires: pip install jsonschema pyyaml", file=sys.stderr)
+    sys.exit(2)
 
 SCHEMA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "schemas", "v1")
 
@@ -59,7 +72,8 @@ def validate_object(schemas, type_name, obj, where):
     try:
         jsonschema.validate(obj, schema, format_checker=jsonschema.FormatChecker())
     except jsonschema.ValidationError as e:
-        err(f"{where}: {e.message} @ {'/'.join(map(str, e.path))}")
+        loc = "/".join(map(str, e.path))
+        err(f"{where}: {e.message}" + (f" @ {loc}" if loc else ""))
 
 
 def parse_md(text, where):
@@ -150,9 +164,12 @@ def main(root: str) -> int:
                         if otype == "consumption":
                             validate_object(schemas, "consumption", obj, where)
                             at = obj.get("at", "")
-                            expected = f"journal/{at[:4]}/{at[5:7]}.jsonl"
-                            if rel.replace(os.sep, "/") != expected:
-                                err(f"{where}: event dated {at[:10]} belongs in {expected} (Core §3)")
+                            # placement is only checkable when at is present and date-shaped;
+                            # a missing/malformed at is already a schema error
+                            if isinstance(at, str) and re.match(r"^\d{4}-(0[1-9]|1[0-2])", at):
+                                expected = f"journal/{at[:4]}/{at[5:7]}.jsonl"
+                                if rel.replace(os.sep, "/") != expected:
+                                    err(f"{where}: event dated {at[:10]} belongs in {expected} (Core §3)")
                             for field in ("supply", "method"):
                                 if field in obj:
                                     refs.append((where, field, obj[field]))
@@ -246,7 +263,37 @@ def report() -> int:
     return 1 if errors else 0
 
 
+@contextlib.contextmanager
+def vault_root(path):
+    """Yield the vault root: the directory itself, or a zip extracted to a tempdir."""
+    if os.path.isdir(path):
+        yield path
+        return
+    if not zipfile.is_zipfile(path):
+        print(f"{path}: not a vault directory or zip archive", file=sys.stderr)
+        sys.exit(2)
+    with tempfile.TemporaryDirectory(prefix="canpuff-") as td, zipfile.ZipFile(path) as zf:
+        for info in zf.infolist():
+            name = info.filename.replace("\\", "/")
+            if name.startswith("/") or any(part == ".." for part in name.split("/")):
+                print(f"{path}: archive member {info.filename!r} escapes the vault root; refusing to extract",
+                      file=sys.stderr)
+                sys.exit(2)
+        zf.extractall(td)
+        root = td
+        if not os.path.isfile(os.path.join(td, "manifest.json")):
+            entries = [e for e in os.listdir(td) if e != "__MACOSX" and not e.startswith(".")]
+            if len(entries) == 1 and os.path.isdir(os.path.join(td, entries[0])):
+                root = os.path.join(td, entries[0])  # Core §8: sole top-level directory wrapper
+        yield root
+
+
 if __name__ == "__main__":
-    if len(sys.argv) != 2 or not os.path.isdir(sys.argv[1]):
-        sys.exit(__doc__)
-    sys.exit(main(sys.argv[1]))
+    if len(sys.argv) != 2:
+        print(__doc__, file=sys.stderr)
+        sys.exit(2)
+    if not os.path.exists(sys.argv[1]):
+        print(f"{sys.argv[1]}: no such file or directory", file=sys.stderr)
+        sys.exit(2)
+    with vault_root(sys.argv[1]) as root:
+        sys.exit(main(root))

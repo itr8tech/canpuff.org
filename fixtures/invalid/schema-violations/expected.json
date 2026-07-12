@@ -1,0 +1,11 @@
+{
+  "verdict": "FAIL",
+  "errors": [
+    "journal/2026/06.jsonl:1: 'at' is a required property",
+    "journal/2026/06.jsonl:2: 11 is greater than the maximum of 10 @ effects/rating",
+    "journal/2026/06.jsonl:3: '00000008-0000-4000-8000-000000000ABC' does not match '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$' @ id",
+    "catalog/supplies/00000008-0000-4000-8000-000000000001.md: 'name' is a required property",
+    "catalog/supplies/00000008-0000-4000-8000-000000000002.md: 'currency' is a dependency of 'cost'"
+  ],
+  "warnings": []
+}

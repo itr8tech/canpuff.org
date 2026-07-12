@@ -1,0 +1,7 @@
+{
+  "verdict": "PASS",
+  "errors": [],
+  "warnings": [
+    "attachments/ef/ef7d69348d7ec9b4ae38388f53727e8ffd5bd61e96a3299e1ea2b77e24244bb3.pdf: unreferenced attachment (tolerated; GC candidate)"
+  ]
+}

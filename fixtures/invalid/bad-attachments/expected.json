@@ -1,0 +1,14 @@
+{
+  "verdict": "FAIL",
+  "errors": [
+    "attachments/ab/not-a-hash.png: attachment name must be a lowercase sha256 stem",
+    "attachments/zz/de3d1607d8b42a381d3d931d067bbb4c8a0e2f6ace46a08d9575adec5df6adb1.pdf: must live under attachments/de/",
+    "attachments/aa/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.png: content hash c4020892341e… does not match filename",
+    "attachments/1e/1e47694227ae426a2f869b4a1d8bc146a72ff2903efa6c27000543d7794aa32b.png: duplicate stem also at attachments/1e/1e47694227ae426a2f869b4a1d8bc146a72ff2903efa6c27000543d7794aa32b.pdf (Core §7)"
+  ],
+  "warnings": [
+    "attachments/zz/de3d1607d8b42a381d3d931d067bbb4c8a0e2f6ace46a08d9575adec5df6adb1.pdf: unreferenced attachment (tolerated; GC candidate)",
+    "attachments/aa/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.png: unreferenced attachment (tolerated; GC candidate)",
+    "attachments/1e/1e47694227ae426a2f869b4a1d8bc146a72ff2903efa6c27000543d7794aa32b.png: unreferenced attachment (tolerated; GC candidate)"
+  ]
+}

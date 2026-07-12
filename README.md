@@ -17,6 +17,8 @@ It is a format for *people*, not businesses. Seed-to-sale systems, dispensary po
 | [`mapping-pufftab-ios.md`](mapping-pufftab-ios.md) | Draft | **Lossless mapping** from the PuffTab iOS app's data model (the first implementation) to CanPUFF, field by field. |
 | [`schemas/`](schemas/) | Draft | JSON Schema (2020-12) for every object type. The schemas are normative for the JSON form. |
 | [`examples/`](examples/) | Draft | A complete example plain vault, plus standalone JSON objects that validate against the schemas. |
+| [`fixtures/`](fixtures/) | Draft | **Conformance fixtures**: edge-heavy valid vaults and deliberately broken ones, each with the reference validator's expected verdict, plus a runner. What makes a third-party implementation testable. |
+| [`tools/`](tools/) | Draft | **Reference tooling**, standalone Python: `validate-vault.py` (conformance) and `diff-vaults.py` (semantic equivalence of two vaults — round-trip verification). Both accept a vault directory or a `.canpuff.zip`. |
 
 ## Design principles
 

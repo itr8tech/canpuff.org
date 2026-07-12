@@ -1,0 +1,7 @@
+{
+  "verdict": "FAIL",
+  "errors": [
+    "catalog/supplies/00000009-0000-4000-8000-000000000001.md: id 00000009-0000-4000-8000-000000000001 already used in journal/2026/06.jsonl:1 (Core §2: vault-wide uniqueness)"
+  ],
+  "warnings": []
+}
