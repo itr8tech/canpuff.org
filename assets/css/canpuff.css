@@ -1,0 +1,691 @@
+@charset "utf-8";
+/* ------------------------------------------------------------------
+   canpuff.org — a standards site that tries not to look like 1997.
+   Layers, oklch tokens, light-dark() theming, no dependencies.
+   ------------------------------------------------------------------ */
+
+@layer reset, tokens, base, layout, components, doc, code, print;
+
+/* ============================== reset ============================= */
+@layer reset {
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body, h1, h2, h3, h4, p, ul, ol, dl, dd, figure, blockquote, pre { margin: 0; }
+  ul[class], ol[class] { padding: 0; list-style: none; }
+  img, svg { display: block; max-width: 100%; }
+  a { color: inherit; }
+  button { font: inherit; color: inherit; }
+  :where(table) { border-collapse: collapse; }
+}
+
+/* ============================== tokens ============================ */
+@layer tokens {
+  :root {
+    color-scheme: light dark;
+
+    /* Hues: 150 resin green (structure) · 82 kief gold · 300 haze violet */
+    --brand:      light-dark(oklch(46% 0.115 150), oklch(78% 0.145 150));
+    --brand-deep: light-dark(oklch(33% 0.090 155), oklch(62% 0.120 152));
+    --brand-soft: light-dark(oklch(62% 0.130 148), oklch(88% 0.100 150));
+    --kief:       light-dark(oklch(64% 0.130 78),  oklch(82% 0.135 82));
+    --haze:       light-dark(oklch(52% 0.140 300), oklch(78% 0.120 300));
+
+    --bg:      light-dark(oklch(99%   0.005 145), oklch(17.5% 0.019 155));
+    --bg-sunk: light-dark(oklch(97.2% 0.010 145), oklch(14.5% 0.017 155));
+    --surface: light-dark(oklch(100%  0     0),   oklch(21.5% 0.021 155));
+    --raised:  light-dark(oklch(100%  0     0),   oklch(24.5% 0.023 155));
+
+    --ink:   light-dark(oklch(24% 0.025 155), oklch(94%   0.012 145));
+    --ink-2: light-dark(oklch(43% 0.022 155), oklch(78%   0.014 145));
+    --ink-3: light-dark(oklch(51% 0.020 155), oklch(65%   0.014 145));
+
+    --line:      light-dark(oklch(90% 0.014 150), oklch(30% 0.022 155));
+    --line-soft: light-dark(oklch(94% 0.010 150), oklch(25% 0.020 155));
+
+    /* Ambient tints, derived so they always agree with the hues above. */
+    --tint-brand: color-mix(in oklab, var(--brand) 10%, transparent);
+    --tint-kief:  color-mix(in oklab, var(--kief)  10%, transparent);
+    --tint-haze:  color-mix(in oklab, var(--haze)  10%, transparent);
+    --spectrum: linear-gradient(90deg,
+      var(--brand-deep), var(--brand) 26%, var(--brand-soft) 44%,
+      var(--kief) 68%, var(--haze));
+
+    --shadow-sm: 0 1px 2px light-dark(oklch(24% 0.03 155 / 0.06), oklch(0% 0 0 / 0.3));
+    --shadow-md: 0 1px 2px light-dark(oklch(24% 0.03 155 / 0.05), oklch(0% 0 0 / 0.28)),
+                 0 8px 24px -12px light-dark(oklch(24% 0.03 155 / 0.14), oklch(0% 0 0 / 0.5));
+
+    --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+            "Helvetica Neue", Arial, sans-serif;
+    --mono: ui-monospace, "SF Mono", SFMono-Regular, "JetBrains Mono",
+            "Cascadia Mono", Menlo, Consolas, monospace;
+
+    --page: 78rem;
+    --measure: 70ch;
+    --radius: 12px;
+    --radius-sm: 7px;
+    --gutter: clamp(1.15rem, 4vw, 2.75rem);
+  }
+
+  :root[data-theme="light"] { color-scheme: light; }
+  :root[data-theme="dark"]  { color-scheme: dark; }
+
+  /* Browsers without light-dark(): a complete, usable light theme. */
+  @supports not (color: light-dark(white, black)) {
+    :root {
+      --brand: oklch(46% 0.115 150); --brand-deep: oklch(33% 0.09 155);
+      --brand-soft: oklch(62% 0.13 148); --kief: oklch(64% 0.13 78);
+      --haze: oklch(52% 0.14 300);
+      --bg: oklch(99% 0.005 145); --bg-sunk: oklch(97.2% 0.01 145);
+      --surface: #fff; --raised: #fff;
+      --ink: oklch(24% 0.025 155); --ink-2: oklch(43% 0.022 155);
+      --ink-3: oklch(51% 0.020 155);
+      --line: oklch(90% 0.014 150); --line-soft: oklch(94% 0.01 150);
+    }
+  }
+}
+
+/* =============================== base ============================= */
+@layer base {
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { animation-duration: 1ms !important; transition-duration: 1ms !important; }
+  }
+
+  body {
+    margin: 0;
+    font-family: var(--sans);
+    font-size: clamp(1rem, 0.96rem + 0.2vw, 1.0625rem);
+    line-height: 1.65;
+    color: var(--ink);
+    background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    accent-color: var(--brand);
+  }
+
+  /* The one flourish everybody sees: a hairline of the whole palette. */
+  body::before {
+    content: ""; position: fixed; inset: 0 0 auto; height: 2px; z-index: 60;
+    background: var(--spectrum); opacity: 0.9;
+  }
+
+  h1, h2, h3, h4 {
+    font-weight: 600; line-height: 1.18;
+    letter-spacing: -0.018em; text-wrap: balance;
+    color: var(--ink);
+  }
+  p { text-wrap: pretty; }
+  strong { font-weight: 620; color: var(--ink); }
+
+  a { text-decoration-thickness: 1px; text-underline-offset: 0.18em; }
+  a:where(:not([class])) {
+    color: color-mix(in oklab, var(--brand) 88%, var(--ink));
+    text-decoration-color: color-mix(in oklab, var(--brand) 38%, transparent);
+  }
+  a:where(:not([class])):hover { text-decoration-color: currentColor; }
+
+  :where(a, button, summary, [tabindex]):focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--brand) 24%, transparent);
+    color: var(--ink);
+  }
+
+  code, kbd, samp, pre { font-family: var(--mono); font-size: 0.885em; }
+  abbr[title] { text-decoration: underline dotted; cursor: help; }
+  hr {
+    height: 1px; border: 0; margin: 3rem 0;
+    background: linear-gradient(90deg, var(--line), color-mix(in oklab, var(--brand) 26%, transparent) 30%, transparent 85%);
+  }
+}
+
+/* ============================== layout ============================ */
+@layer layout {
+  .wrap { width: 100%; max-width: var(--page); margin-inline: auto; padding-inline: var(--gutter); }
+  .skip {
+    position: absolute; left: 0.5rem; top: -3rem; z-index: 80;
+    padding: 0.5rem 0.9rem; border-radius: var(--radius-sm);
+    background: var(--brand); color: var(--bg); font-weight: 600;
+    text-decoration: none; transition: top 0.15s ease;
+  }
+  .skip:focus { top: 0.5rem; }
+
+  /* ---- masthead ---- */
+  .masthead {
+    position: sticky; top: 0; z-index: 50;
+    border-bottom: 1px solid var(--line);
+    background: color-mix(in oklab, var(--bg) 82%, transparent);
+    backdrop-filter: saturate(160%) blur(12px);
+  }
+  .masthead__in {
+    display: flex; align-items: center; gap: 1rem;
+    min-height: 3.9rem; padding-block: 0.55rem;
+  }
+  .brandmark {
+    display: inline-flex; align-items: center; gap: 0.6rem;
+    text-decoration: none; margin-right: auto; flex: 0 0 auto;
+  }
+  .brandmark svg { width: 26px; height: 26px; flex: none; }
+  .brandmark b {
+    font-size: 1.0625rem; font-weight: 640; letter-spacing: -0.015em;
+  }
+  .brandmark small {
+    font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--ink-3);
+    padding-left: 0.55rem; margin-left: 0.15rem;
+    border-left: 1px solid var(--line);
+  }
+  @media (max-width: 34rem) { .brandmark small { display: none; } }
+
+  .navlinks {
+    display: flex; align-items: center; gap: 0.15rem; min-width: 0;
+    font-size: 0.9rem; overflow-x: auto; scrollbar-width: none;
+  }
+  .navlinks::-webkit-scrollbar { display: none; }
+  .navlinks a {
+    padding: 0.34rem 0.6rem; border-radius: var(--radius-sm);
+    text-decoration: none; color: var(--ink-2); white-space: nowrap;
+  }
+  .navlinks a:hover { color: var(--ink); background: var(--tint-brand); }
+  .navlinks a[aria-current] {
+    color: color-mix(in oklab, var(--brand) 80%, var(--ink));
+    background: var(--tint-brand);
+    font-weight: 560;
+  }
+  /* Narrow screens keep every link: the bar wraps onto a second, scrollable
+     row rather than hiding sections nobody can then reach. */
+  @media (max-width: 52rem) {
+    .masthead__in { flex-wrap: wrap; row-gap: 0.15rem; min-height: 0; }
+    .navlinks {
+      order: 3; width: 100%; padding-top: 0.4rem;
+      border-top: 1px solid var(--line-soft);
+    }
+  }
+
+  .iconbtn {
+    display: grid; place-items: center; flex: none;
+    inline-size: 2.2rem; block-size: 2.2rem;
+    border: 1px solid var(--line); border-radius: var(--radius-sm);
+    background: var(--surface); color: var(--ink-2); cursor: pointer;
+  }
+  .iconbtn:hover { color: var(--ink); border-color: color-mix(in oklab, var(--brand) 40%, var(--line)); }
+  .iconbtn svg { width: 17px; height: 17px; }
+  .iconbtn .moon { display: none; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .iconbtn .moon { display: block; }
+    :root:not([data-theme="light"]) .iconbtn .sun { display: none; }
+  }
+  :root[data-theme="dark"] .iconbtn .moon { display: block; }
+  :root[data-theme="dark"] .iconbtn .sun { display: none; }
+
+  /* ---- footer ---- */
+  .foot {
+    margin-top: 5rem; padding-block: 2.75rem 3.5rem;
+    border-top: 1px solid var(--line);
+    background: var(--bg-sunk);
+    font-size: 0.9rem; color: var(--ink-2);
+  }
+  .foot__in { display: grid; gap: 1.75rem 3rem; grid-template-columns: minmax(18rem, 1fr) auto; }
+  @media (max-width: 46rem) { .foot__in { grid-template-columns: 1fr; } }
+  .foot p { max-width: 48ch; }
+  .foot p + p { margin-top: 0.55rem; }
+  .foot .quip { color: var(--ink-3); font-style: italic; }
+  .foot nav { display: grid; gap: 0.4rem; align-content: start; }
+  .foot nav a { color: var(--ink-2); text-decoration: none; }
+  .foot nav a:hover { color: var(--ink); text-decoration: underline; }
+  .foot .lic {
+    font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.04em;
+    color: var(--ink-3); text-transform: uppercase;
+  }
+}
+
+/* ============================ components ========================== */
+@layer components {
+  /* ---- eyebrow / section headers ---- */
+  .eyebrow {
+    display: flex; align-items: center; gap: 0.55rem;
+    font-family: var(--mono); font-size: 0.72rem; font-weight: 500;
+    letter-spacing: 0.11em; text-transform: uppercase; color: var(--ink-3);
+    margin-bottom: 1rem;
+  }
+  .eyebrow::before {
+    content: ""; inline-size: 1.5rem; block-size: 3px; border-radius: 3px;
+    background: var(--spectrum);
+  }
+
+  /* ---- pills ---- */
+  .pill {
+    --c: var(--brand);
+    display: inline-flex; align-items: center; gap: 0.35rem;
+    padding: 0.14rem 0.55rem; border-radius: 999px;
+    font-family: var(--mono); font-size: 0.7rem; font-weight: 500;
+    letter-spacing: 0.045em; text-transform: uppercase; white-space: nowrap;
+    color: color-mix(in oklab, var(--c) 62%, var(--ink));
+    background: color-mix(in oklab, var(--c) 13%, transparent);
+    border: 1px solid color-mix(in oklab, var(--c) 26%, transparent);
+  }
+  .pill--draft { --c: var(--kief); }
+  .pill--tool  { --c: var(--haze); }
+
+  /* ---- buttons ---- */
+  .btn {
+    display: inline-flex; align-items: center; gap: 0.45rem;
+    padding: 0.6rem 1.05rem; border-radius: var(--radius-sm);
+    font-size: 0.94rem; font-weight: 560; text-decoration: none;
+    border: 1px solid transparent; cursor: pointer;
+    transition: transform 0.12s ease, box-shadow 0.12s ease, background-color 0.12s ease;
+  }
+  .btn:hover { transform: translateY(-1px); }
+  .btn--primary {
+    color: light-dark(oklch(99% 0.01 145), oklch(15% 0.02 155));
+    background: linear-gradient(160deg in oklab,
+      color-mix(in oklab, var(--brand) 88%, white) 0%, var(--brand) 55%, var(--brand-deep) 100%);
+    box-shadow: var(--shadow-sm), inset 0 1px 0 color-mix(in oklab, white 22%, transparent);
+  }
+  .btn--primary:hover { box-shadow: var(--shadow-md); }
+  .btn--ghost {
+    color: var(--ink); background: var(--surface); border-color: var(--line);
+    box-shadow: var(--shadow-sm);
+  }
+  .btn--ghost:hover { border-color: color-mix(in oklab, var(--brand) 42%, var(--line)); }
+  .btn .arrow { transition: transform 0.15s ease; }
+  .btn:hover .arrow { transform: translateX(2px); }
+
+  /* ---- hero ---- */
+  .hero { position: relative; padding-block: clamp(3rem, 8vw, 6rem) clamp(2.5rem, 5vw, 4rem); overflow: clip; }
+  .hero::before {
+    content: ""; position: absolute; inset: -30% -10% auto; block-size: 130%;
+    background:
+      radial-gradient(58% 46% at 12% 8%,  color-mix(in oklab, var(--brand) 20%, transparent), transparent 70%),
+      radial-gradient(46% 40% at 88% 2%,  color-mix(in oklab, var(--kief)  16%, transparent), transparent 68%),
+      radial-gradient(50% 55% at 62% 82%, color-mix(in oklab, var(--haze)  12%, transparent), transparent 72%);
+    pointer-events: none; z-index: -1;
+  }
+  .hero h1 {
+    font-size: clamp(2.1rem, 1.35rem + 3.4vw, 3.55rem);
+    letter-spacing: -0.032em; max-width: 26ch;
+  }
+  .hero h1 .gr {
+    background: linear-gradient(96deg in oklab,
+      var(--brand-deep) 0%, var(--brand) 48%,
+      color-mix(in oklab, var(--kief) 55%, var(--brand-soft)) 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .hero .lede {
+    margin-top: 1.15rem; max-width: 62ch;
+    font-size: clamp(1.05rem, 1rem + 0.4vw, 1.24rem);
+    line-height: 1.55; color: var(--ink-2);
+  }
+  .hero .cta { display: flex; flex-wrap: wrap; gap: 0.7rem; margin-top: 2rem; }
+
+  .quote {
+    margin-top: 2.25rem; max-width: 58ch; padding: 1rem 0 1rem 1.25rem;
+    border-left: 3px solid transparent;
+    border-image: linear-gradient(180deg in oklab, var(--brand), var(--kief)) 1;
+    font-size: 1.02rem; color: var(--ink-2);
+  }
+  .quote strong { color: var(--ink); }
+
+  /* ---- stat strip ---- */
+  .stats {
+    display: grid; gap: 1px; margin-top: 3rem;
+    grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+    background: var(--line); border: 1px solid var(--line);
+    border-radius: var(--radius); overflow: hidden;
+  }
+  .stats div {
+    display: flex; flex-direction: column;
+    background: var(--surface); padding: 1.05rem 1.2rem;
+  }
+  .stats dt {
+    font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.09em;
+    text-transform: uppercase; color: var(--ink-3);
+  }
+  .stats dd {
+    margin: 0.3rem 0 0; margin-top: auto; padding-top: 0.3rem;
+    font-size: 1.4rem; font-weight: 600;
+    letter-spacing: -0.02em; font-variant-numeric: tabular-nums;
+    color: color-mix(in oklab, var(--brand) 72%, var(--ink));
+  }
+  .stats .unit { font-size: 0.7em; font-weight: 500; color: var(--ink-3); }
+
+  /* ---- generic section ---- */
+  .section { padding-block: clamp(2.75rem, 6vw, 4.5rem); }
+  .section h2 { font-size: clamp(1.5rem, 1.2rem + 1.1vw, 2rem); max-width: 34ch; }
+  .section h2 + p { margin-top: 0.85rem; }
+  .section p { max-width: var(--measure); color: var(--ink-2); }
+  .section p + p { margin-top: 1rem; }
+  .section .cta { margin-top: 2rem; }
+  .section > .wrap > h3 { margin-top: 2.9rem; margin-bottom: -0.5rem; font-size: 1.14rem; }
+  .section--sunk { background: var(--bg-sunk); border-block: 1px solid var(--line); }
+
+  /* ---- doc cards ---- */
+  .cards {
+    display: grid; gap: 1rem; margin-top: 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+  }
+  .card {
+    position: relative; isolation: isolate;
+    display: flex; flex-direction: column; gap: 0.55rem;
+    padding: 1.3rem 1.35rem 1.4rem;
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--radius); box-shadow: var(--shadow-sm);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+  }
+  .card::before {
+    content: ""; position: absolute; inset: 0 0 auto; block-size: 2px;
+    border-radius: var(--radius) var(--radius) 0 0;
+    background: var(--spectrum); opacity: 0; transition: opacity 0.18s ease;
+  }
+  .card:hover, .card:focus-within {
+    transform: translateY(-2px);
+    border-color: color-mix(in oklab, var(--brand) 30%, var(--line));
+    box-shadow: var(--shadow-md);
+  }
+  .card:hover::before, .card:focus-within::before { opacity: 1; }
+  .card__top { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; }
+  .card h3 { font-size: 1.06rem; }
+  .card h3 a { text-decoration: none; color: color-mix(in oklab, var(--brand) 58%, var(--ink)); }
+  .card > code { align-self: start; }
+  .card h3 a::after { content: ""; position: absolute; inset: 0; border-radius: var(--radius); }
+  .card code { color: var(--ink-2); font-size: 0.8rem; }
+  .card p { color: var(--ink-2); font-size: 0.935rem; line-height: 1.55; }
+  .card .meta {
+    margin-top: auto; padding-top: 0.5rem;
+    font-family: var(--mono); font-size: 0.72rem; color: var(--ink-3);
+  }
+
+  /* ---- principles ---- */
+  .principles {
+    display: grid; gap: 1.5rem 2.5rem; margin-top: 2.25rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+    counter-reset: p;
+  }
+  .principles > li { counter-increment: p; padding-left: 2.6rem; position: relative; }
+  .principles > li::before {
+    content: counter(p, decimal-leading-zero);
+    position: absolute; left: 0; top: 0.05rem;
+    font-family: var(--mono); font-size: 0.8rem; font-weight: 500;
+    display: grid; place-items: center;
+    inline-size: 1.85rem; block-size: 1.85rem; border-radius: 50%;
+    color: color-mix(in oklab, var(--brand) 70%, var(--ink));
+    background: color-mix(in oklab, var(--brand) 11%, transparent);
+    border: 1px solid color-mix(in oklab, var(--brand) 22%, transparent);
+  }
+  .principles h3 { font-size: 1rem; margin-bottom: 0.25rem; }
+  .principles p { color: var(--ink-2); font-size: 0.935rem; line-height: 1.55; }
+
+  /* ---- side-by-side sample panes ---- */
+  .panes { display: grid; gap: 1.15rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr)); }
+  .wrap > .panes, .wrap > .pane { margin-top: 2rem; }
+  .pane {
+    display: flex; flex-direction: column; overflow: hidden;
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--radius); box-shadow: var(--shadow-sm);
+  }
+  .pane > figcaption {
+    display: flex; align-items: baseline; gap: 0.6rem; flex-wrap: wrap;
+    padding: 0.7rem 1rem; border-bottom: 1px solid var(--line);
+    background: linear-gradient(180deg in oklab, var(--tint-brand), transparent);
+    font-size: 0.85rem; font-weight: 560;
+  }
+  .pane > figcaption .ref {
+    font-family: var(--mono); font-size: 0.74rem; font-weight: 400; color: var(--ink-3);
+  }
+  .pane pre { margin: 0; padding: 1rem; overflow-x: auto; font-size: 0.79rem; line-height: 1.7; }
+  .pane pre .dir { color: color-mix(in oklab, var(--brand) 74%, var(--ink)); font-weight: 560; }
+  .pane > p { padding: 0.85rem 1rem 1rem; margin: 0; color: var(--ink-2); font-size: 0.85rem; max-width: 68ch; }
+
+  /* ---- link list (index pages) ---- */
+  .filelist {
+    margin-top: 1.75rem; border: 1px solid var(--line);
+    border-radius: var(--radius); overflow: hidden; background: var(--surface);
+  }
+  .filelist li + li { border-top: 1px solid var(--line-soft); }
+  .filelist a {
+    display: grid; grid-template-columns: 11.5rem minmax(0, 1fr) auto;
+    align-items: baseline; gap: 0.4rem 1rem;
+    padding: 0.72rem 1.1rem; text-decoration: none;
+  }
+  .filelist a:hover { background: var(--tint-brand); }
+  .filelist a > code {
+    justify-self: start; font-weight: 560;
+    color: color-mix(in oklab, var(--brand) 80%, var(--ink));
+  }
+  .filelist a > span { color: var(--ink-2); font-size: 0.9rem; }
+  .filelist a > .grow { color: var(--ink-3); font-family: var(--mono); font-size: 0.74rem; }
+  @media (max-width: 46rem) {
+    .filelist a { grid-template-columns: minmax(0, 1fr) auto; }
+    .filelist a > code { grid-column: 1 / -1; }
+  }
+
+  .note {
+    display: flex; gap: 0.85rem; margin-top: 2rem; padding: 1rem 1.15rem;
+    border: 1px solid color-mix(in oklab, var(--kief) 30%, var(--line));
+    border-radius: var(--radius); background: var(--tint-kief);
+    font-size: 0.93rem; color: var(--ink-2);
+  }
+  .note b { color: var(--ink); }
+}
+
+/* =========================== documents =========================== */
+@layer doc {
+  .docgrid {
+    display: grid; gap: 0 3.25rem; align-items: start;
+    grid-template-columns: minmax(0, 1fr) 15.5rem;
+    padding-block: 2.5rem 1rem;
+  }
+  @media (max-width: 68rem) { .docgrid { grid-template-columns: minmax(0, 1fr); } }
+
+  /* ---- table of contents ---- */
+  .toc {
+    grid-column: 2; grid-row: 1 / span 2;
+    position: sticky; top: 5rem; max-height: calc(100svh - 7rem);
+    overflow-y: auto; overscroll-behavior: contain;
+    font-size: 0.85rem; padding-bottom: 1.5rem;
+    scrollbar-width: thin;
+    border-left: 1px solid var(--line); padding-left: 1.4rem;
+  }
+  .toc h2 {
+    font-family: var(--mono); font-size: 0.7rem; font-weight: 500;
+    letter-spacing: 0.11em; text-transform: uppercase; color: var(--ink-3);
+    margin-bottom: 0.7rem;
+  }
+  .toc ol { padding: 0; margin: 0; list-style: none; }
+  .toc a {
+    display: block; padding: 0.24rem 0; color: var(--ink-2); text-decoration: none;
+    border-left: 2px solid transparent; margin-left: -1.4rem; padding-left: 1.35rem;
+  }
+  .toc a:hover { color: var(--ink); }
+  .toc a[data-active] {
+    color: color-mix(in oklab, var(--brand) 80%, var(--ink));
+    border-left-color: var(--brand); font-weight: 560;
+  }
+  .toc ol ol a { padding-left: 2.35rem; font-size: 0.945em; color: var(--ink-3); }
+  .toc ol ol a:hover, .toc ol ol a[data-active] { color: color-mix(in oklab, var(--brand) 70%, var(--ink)); }
+  /* Below the sidebar breakpoint the rail becomes a compact two-column card —
+     no height cap, so nothing is clipped mid-word. */
+  @media (max-width: 68rem) {
+    .toc {
+      grid-column: 1; grid-row: auto;
+      position: static; max-height: none; overflow: visible;
+      margin-bottom: 2.5rem;
+      border: 1px solid var(--line); border-radius: var(--radius);
+      padding: 1.1rem 1.25rem; background: var(--bg-sunk);
+    }
+    .toc > ol { columns: 2; column-gap: 2rem; }
+    .toc > ol > li { break-inside: avoid; }
+    .toc a { margin-left: 0; padding-left: 0.7rem; }
+    .toc ol ol a { padding-left: 1.7rem; }
+  }
+  /* On a phone the rail keeps the twelve top-level sections and drops the
+     subsections — a full-length contents list ahead of the document is worse
+     than a short one. Every heading is still linkable from the document. */
+  @media (max-width: 34rem) {
+    .toc > ol { columns: 1; }
+    .toc ol ol { display: none; }
+  }
+
+  /* ---- document header ---- */
+  .dochead { grid-column: 1; padding-bottom: 0.5rem; }
+  .dochead .crumbs {
+    display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;
+    font-family: var(--mono); font-size: 0.74rem; color: var(--ink-3);
+    margin-bottom: 0.9rem;
+  }
+  .dochead .crumbs a { text-decoration: none; }
+  .dochead .crumbs a:hover { color: var(--ink); text-decoration: underline; }
+  .dochead .crumbs .sep { opacity: 0.5; }
+
+  /* ---- the prose itself ---- */
+  .doc { grid-column: 1; min-width: 0; }
+  .doc > * + * { margin-top: 1.15rem; }
+  .doc p, .doc li { color: var(--ink-2); }
+  .doc > p, .doc > ul, .doc > ol, .doc > blockquote { max-width: var(--measure); }
+
+  .doc h1 {
+    font-size: clamp(1.85rem, 1.4rem + 2vw, 2.7rem);
+    letter-spacing: -0.03em; margin-bottom: 0.25rem;
+  }
+  /* The metadata block every spec opens with. */
+  .doc h1 + p {
+    max-width: var(--measure);
+    padding: 0.95rem 1.15rem 0.95rem calc(1.15rem + 3px);
+    border: 1px solid var(--line); border-left: 0;
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    background:
+      linear-gradient(180deg in oklab, var(--brand), var(--kief)) left / 3px 100% no-repeat,
+      var(--bg-sunk);
+    font-size: 0.94rem; line-height: 1.7;
+  }
+  .doc h2 {
+    font-size: clamp(1.32rem, 1.15rem + 0.7vw, 1.6rem);
+    margin-top: 3.25rem; padding-top: 1.15rem;
+    border-top: 1px solid var(--line);
+  }
+  /* A thematic break already separates the sections — don't double the rule. */
+  .doc hr + h2 { border-top: 0; padding-top: 0; margin-top: 2rem; }
+  .doc h3 { font-size: 1.12rem; margin-top: 2.35rem; }
+  .doc h4 { font-size: 1rem; margin-top: 1.85rem; color: var(--ink-2); }
+  .doc :is(h1, h2, h3, h4) { scroll-margin-top: 5.5rem; }
+  .doc :is(h2, h3, h4) code { font-size: 0.88em; background: none; padding: 0; border: 0; color: inherit; }
+
+  /* Deep links get a quiet section marker on hover. */
+  .doc .anchor {
+    float: left; margin-left: -1.25em; width: 1.25em;
+    color: var(--ink-3); text-decoration: none; opacity: 0;
+    font-weight: 400; transition: opacity 0.12s ease;
+  }
+  .doc :is(h2, h3, h4):hover .anchor, .doc .anchor:focus-visible { opacity: 1; }
+  @media (max-width: 80rem) { .doc .anchor { display: none; } }
+
+  /* Jumped-to sections glow briefly instead of vanishing under the header. */
+  .doc :is(h2, h3, h4):target {
+    background: linear-gradient(90deg in oklab, var(--tint-kief), transparent 65%);
+    box-shadow: -0.6rem 0 0 var(--tint-kief);
+  }
+
+  .doc :is(ul, ol) { padding-left: 1.35rem; }
+  .doc li + li { margin-top: 0.45rem; }
+  .doc li::marker { color: color-mix(in oklab, var(--brand) 55%, var(--ink-3)); }
+
+  .doc blockquote {
+    padding: 0.85rem 1.15rem; border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    border-left: 3px solid var(--brand); background: var(--tint-brand);
+  }
+  .doc blockquote > * + * { margin-top: 0.6rem; }
+
+  /* ---- inline code (documents and hand-written pages alike) ---- */
+  :where(.doc, main) :not(pre) > code {
+    padding: 0.1em 0.36em; border-radius: 4px;
+    background: color-mix(in oklab, var(--brand) 8%, var(--bg-sunk));
+    border: 1px solid color-mix(in oklab, var(--brand) 12%, var(--line));
+    color: color-mix(in oklab, var(--brand) 34%, var(--ink));
+    white-space: nowrap;
+  }
+  :where(.doc, main) .pane :not(pre) > code { background: none; border: 0; padding: 0; }
+
+  /* ---- tables ---- */
+  .doc table {
+    width: 100%; margin-block: 1.6rem; font-size: 0.9rem;
+    font-variant-numeric: tabular-nums;
+    border: 1px solid var(--line); border-radius: var(--radius);
+    border-spacing: 0; overflow: hidden;
+  }
+  .doc thead th {
+    text-align: left; font-weight: 600; font-size: 0.78rem;
+    letter-spacing: 0.055em; text-transform: uppercase; color: var(--ink-3);
+    padding: 0.62rem 0.85rem; white-space: nowrap;
+    background: linear-gradient(180deg in oklab, var(--tint-brand), transparent);
+    border-bottom: 1px solid var(--line);
+  }
+  .doc tbody td { padding: 0.62rem 0.85rem; vertical-align: top; color: var(--ink-2); line-height: 1.55; }
+  .doc tbody tr + tr td { border-top: 1px solid var(--line-soft); }
+  .doc tbody tr:hover td { background: color-mix(in oklab, var(--brand) 4%, transparent); }
+  .doc tbody td:first-child { color: var(--ink); }
+  .doc tbody td:first-child code { white-space: nowrap; }
+  @media (max-width: 46rem) {
+    .doc table { display: block; overflow-x: auto; width: max-content; max-width: 100%; }
+  }
+}
+
+/* ============================== code ============================= */
+@layer code {
+  .highlighter-rouge, .pane pre {
+    /* Rouge token palette — one set, both themes, via light-dark(). */
+    --t-key:   light-dark(oklch(42% 0.13 265), oklch(80% 0.11 265));
+    --t-str:   light-dark(oklch(43% 0.11 152), oklch(80% 0.13 152));
+    --t-num:   light-dark(oklch(48% 0.13 40),  oklch(80% 0.12 55));
+    --t-const: light-dark(oklch(46% 0.15 320), oklch(80% 0.11 320));
+    --t-punc:  var(--ink-3);
+    --t-com:   light-dark(oklch(58% 0.03 155), oklch(58% 0.02 155));
+  }
+  .doc .highlighter-rouge {
+    margin-block: 1.6rem;
+    border: 1px solid var(--line); border-radius: var(--radius);
+    background: var(--bg-sunk); overflow: hidden;
+  }
+  .doc .highlighter-rouge .highlight { background: none; }
+  .doc pre.highlight, .doc .highlighter-rouge pre {
+    margin: 0; padding: 1.05rem 1.15rem; overflow-x: auto;
+    font-size: 0.8rem; line-height: 1.7; color: var(--ink);
+    tab-size: 2;
+  }
+  .doc pre code { background: none; border: 0; padding: 0; white-space: pre; }
+
+  /* Rouge classes. JSON, YAML and plaintext are what these documents use. */
+  :is(.highlight, .pane pre) {
+    .c, .c1, .cm, .cs { color: var(--t-com); font-style: italic; }
+    .k, .kd, .kn, .kp, .kr, .kt, .nt { color: var(--t-key); }
+    .kc, .no, .nb { color: var(--t-const); }
+    .s, .s1, .s2, .sb, .sc, .sd, .se, .sh, .si, .sx, .sr, .dl, .nv { color: var(--t-str); }
+    .m, .mi, .mf, .mh, .mo, .il { color: var(--t-num); }
+    .na, .nl, .py { color: color-mix(in oklab, var(--haze) 78%, var(--ink)); }
+    .p, .pi, .o, .ow, .nn { color: var(--t-punc); }
+    /* Rouge flags the pseudo-syntax these specs use on purpose ("a" | "b",
+       trailing // notes) as an error. It is not one — render it as prose. */
+    .err { color: var(--ink-2); }
+    .gi { color: var(--t-str); }
+    .gd { color: light-dark(oklch(50% 0.19 25), oklch(76% 0.16 25)); }
+  }
+}
+
+/* ============================== print ============================= */
+@layer print {
+  @media print {
+    body::before, .masthead, .toc, .foot nav, .skip, .doc .anchor { display: none !important; }
+    :root { color-scheme: light; }
+    body { background: #fff; color: #000; font-size: 10.5pt; }
+    .docgrid { display: block; padding: 0; }
+    .doc { --measure: none; }
+    .doc h2 { break-after: avoid; page-break-after: avoid; }
+    .doc table, .doc .highlighter-rouge, .doc pre { break-inside: avoid; }
+    .doc a::after { content: " (" attr(href) ")"; font-size: 0.85em; color: #555; word-break: break-all; }
+    .doc a[href^="#"]::after { content: ""; }
+  }
+}

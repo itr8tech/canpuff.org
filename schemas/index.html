@@ -1,0 +1,83 @@
+---
+layout: page
+nav: schemas
+title: "JSON Schemas"
+description: >-
+  JSON Schema 2020-12 definitions for every CanPUFF v1 object type, served at
+  their canonical $id URLs.
+---
+
+<section class="section">
+  <div class="wrap">
+    <p class="eyebrow">Schemas · v1 · 1.0-rc</p>
+    <h2>JSON Schema, 2020-12, one file per object type.</h2>
+    <p>
+      The schemas are <strong>normative for the JSON form</strong> of CanPUFF
+      objects. Each is served here at the exact URL it declares as its
+      <code>$id</code>, so a validator can resolve them over the network without
+      any rewriting.
+    </p>
+    <p>
+      Precision limits (grams to 4 decimal places, money to 2) are writer
+      requirements and are deliberately <em>not</em> asserted by the schemas —
+      IEEE-754 <code>multipleOf</code> is unreliable. See
+      <a href="{{ '/canpuff-v1.html#2-common-requirements-for-all-objects' | relative_url }}">Core §2</a>.
+    </p>
+
+    <ul class="filelist">
+      <li><a href="{{ '/schemas/v1/manifest.json' | relative_url }}">
+        <code>manifest.json</code>
+        <span>Vault identity and format version — the file that makes a directory a vault.</span>
+        <span class="grow">Core §3.1</span></a></li>
+      <li><a href="{{ '/schemas/v1/consumption.json' | relative_url }}">
+        <code>consumption.json</code>
+        <span>The journal event: what was consumed, when, how much, with whom, to what effect.</span>
+        <span class="grow">Core §4.1</span></a></li>
+      <li><a href="{{ '/schemas/v1/supply.json' | relative_url }}">
+        <code>supply.json</code>
+        <span>A package on hand — potency, terpenes, cost, remaining grams.</span>
+        <span class="grow">Core §5.1</span></a></li>
+      <li><a href="{{ '/schemas/v1/shop.json' | relative_url }}">
+        <code>shop.json</code>
+        <span>Where it was bought, including delivery and loyalty identifiers.</span>
+        <span class="grow">Core §5.2</span></a></li>
+      <li><a href="{{ '/schemas/v1/chain.json' | relative_url }}">
+        <code>chain.json</code>
+        <span>A retail chain a shop belongs to.</span>
+        <span class="grow">Core §5.2</span></a></li>
+      <li><a href="{{ '/schemas/v1/brand.json' | relative_url }}">
+        <code>brand.json</code>
+        <span>A product brand, optionally pointing at its producer.</span>
+        <span class="grow">Core §5.3</span></a></li>
+      <li><a href="{{ '/schemas/v1/producer.json' | relative_url }}">
+        <code>producer.json</code>
+        <span>The licensed producer behind a brand.</span>
+        <span class="grow">Core §5.3</span></a></li>
+      <li><a href="{{ '/schemas/v1/method.json' | relative_url }}">
+        <code>method.json</code>
+        <span>A way of consuming, with aliases for quick and voice entry.</span>
+        <span class="grow">Core §5.4</span></a></li>
+      <li><a href="{{ '/schemas/v1/tax-rate.json' | relative_url }}">
+        <code>tax-rate.json</code>
+        <span>A named tax applied to purchases; the math is normative.</span>
+        <span class="grow">Core §5.5</span></a></li>
+      <li><a href="{{ '/schemas/v1/terpene.json' | relative_url }}">
+        <code>terpene.json</code>
+        <span>An optional dictionary entry: aroma, common effects, boiling point.</span>
+        <span class="grow">Core §5.6</span></a></li>
+      <li><a href="{{ '/schemas/v1/tombstone.json' | relative_url }}">
+        <code>tombstone.json</code>
+        <span>A deleted object reduced to a deletion marker — what stops deleted records resurrecting on import.</span>
+        <span class="grow">Core §2</span></a></li>
+    </ul>
+
+    <div class="note">
+      <div>
+        <b>Validating a whole vault?</b> The schemas cover individual objects.
+        Vault-level rules — file placement, id uniqueness across tiers, attachment
+        content-addressing, catalog round-tripping — are checked by
+        <a href="{{ '/tools/' | relative_url }}"><code>validate-vault.py</code></a>.
+      </div>
+    </div>
+  </div>
+</section>

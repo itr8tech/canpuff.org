@@ -1,0 +1,72 @@
+---
+layout: page
+nav: examples
+title: "Examples"
+description: >-
+  A complete example CanPUFF plain vault, plus one standalone JSON object per
+  type that validates against the v1 schemas.
+---
+
+<section class="section">
+  <div class="wrap">
+    <p class="eyebrow">Examples · 1.0-rc</p>
+    <h2>Something to validate against before you write any code.</h2>
+    <p>
+      One standalone JSON object per type, each of which validates against its
+      <a href="{{ '/schemas/' | relative_url }}">schema</a>, plus a complete plain
+      vault with a journal, a populated catalog, an attachment, and app-private
+      data — the small cases that catch the most implementation bugs.
+    </p>
+
+    <h3>Standalone objects</h3>
+    <ul class="filelist">
+      <li><a href="{{ '/examples/objects/manifest.json' | relative_url }}"><code>manifest.json</code><span>Vault identity and generator.</span><span class="grow">Core §3.1</span></a></li>
+      <li><a href="{{ '/examples/objects/consumption.json' | relative_url }}"><code>consumption.json</code><span>A shared session, with effects, context and a photo reference.</span><span class="grow">Core §4.1</span></a></li>
+      <li><a href="{{ '/examples/objects/supply.json' | relative_url }}"><code>supply.json</code><span>A package on hand, with terpenes, taxes and cost.</span><span class="grow">Core §5.1</span></a></li>
+      <li><a href="{{ '/examples/objects/shop.json' | relative_url }}"><code>shop.json</code><span>A shop, with delivery and a loyalty identifier.</span><span class="grow">Core §5.2</span></a></li>
+      <li><a href="{{ '/examples/objects/chain.json' | relative_url }}"><code>chain.json</code><span>The chain that shop belongs to.</span><span class="grow">Core §5.2</span></a></li>
+      <li><a href="{{ '/examples/objects/brand.json' | relative_url }}"><code>brand.json</code><span>A brand pointing at its producer.</span><span class="grow">Core §5.3</span></a></li>
+      <li><a href="{{ '/examples/objects/producer.json' | relative_url }}"><code>producer.json</code><span>A licensed producer.</span><span class="grow">Core §5.3</span></a></li>
+      <li><a href="{{ '/examples/objects/method.json' | relative_url }}"><code>method.json</code><span>A consumption method with aliases and a default dose.</span><span class="grow">Core §5.4</span></a></li>
+      <li><a href="{{ '/examples/objects/tax-rate.json' | relative_url }}"><code>tax-rate.json</code><span>A named tax applied by default to new purchases.</span><span class="grow">Core §5.5</span></a></li>
+      <li><a href="{{ '/examples/objects/terpene.json' | relative_url }}"><code>terpene.json</code><span>A terpene dictionary entry.</span><span class="grow">Core §5.6</span></a></li>
+      <li><a href="{{ '/examples/objects/tombstone.json' | relative_url }}"><code>tombstone.json</code><span>A deletion marker.</span><span class="grow">Core §2</span></a></li>
+    </ul>
+
+    <h3>A complete plain vault</h3>
+    <figure class="pane">
+      <figcaption>examples/plain-vault/ <span class="ref">· 13 records, 1 attachment</span></figcaption>
+<pre><span class="dir">manifest.json</span>
+<span class="dir">journal/</span>2026/07.jsonl              <span class="c">3 consumption events</span>
+<span class="dir">catalog/</span>supplies/                  <span class="c">2 cards — one finished, one on hand</span>
+         shops/  chains/           <span class="c">1 each, cross-referenced</span>
+         brands/  producers/        <span class="c">1 each</span>
+         methods/                   <span class="c">2 cards, with aliases</span>
+         tax-rates/                 <span class="c">2 cards — GST and PST</span>
+         terpenes/                  <span class="c">1 dictionary entry</span>
+<span class="dir">attachments/</span>23/2351…fab3.png       <span class="c">content-addressed, hash verified</span>
+<span class="dir">apps/</span>pufftab/settings.json      <span class="c">app-private data, carried through intact</span></pre>
+      <p>
+        Run <code>validate-vault.py</code> against it and it passes clean — that is
+        part of the conformance suite.
+      </p>
+    </figure>
+
+    <div class="cta">
+      <a class="btn btn--primary" href="{{ site.repo }}/tree/main/examples/plain-vault">
+        Browse the vault on GitHub <span class="arrow" aria-hidden="true">→</span>
+      </a>
+      <a class="btn btn--ghost" href="{{ '/examples/plain-vault/manifest.json' | relative_url }}">View its manifest</a>
+      <a class="btn btn--ghost" href="{{ '/examples/plain-vault/journal/2026/07.jsonl' | relative_url }}">View its journal</a>
+    </div>
+
+    <div class="note">
+      <div>
+        <b>The catalog cards are best read from the repository.</b> They are
+        Markdown files with YAML frontmatter, which is exactly what a site
+        generator wants to render into a web page — so the raw source lives in
+        git, where you can also clone the whole vault in one step.
+      </div>
+    </div>
+  </div>
+</section>

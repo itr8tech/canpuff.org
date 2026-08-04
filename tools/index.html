@@ -1,0 +1,61 @@
+---
+layout: page
+nav: tools
+title: "Reference tooling"
+description: >-
+  Standalone Python reference tools for CanPUFF: validate-vault.py for
+  conformance and diff-vaults.py for semantic equivalence of two vaults.
+---
+
+<section class="section">
+  <div class="wrap">
+    <p class="eyebrow">Tooling · 1.0-rc</p>
+    <h2>Two Python scripts. No packaging, no framework, no surprises.</h2>
+    <p>
+      These are the reference implementations of the spec's own checks. Both are
+      single files you can read end to end, and both accept either a plain-vault
+      directory or a <code>.canpuff.zip</code>
+      (<a href="{{ '/canpuff-v1.html#8-vault-interchange-exportimport' | relative_url }}">Core §8</a>).
+    </p>
+
+    <ul class="filelist">
+      <li><a href="{{ '/tools/validate-vault.py' | relative_url }}">
+        <code>validate-vault.py</code>
+        <span>Conformance: manifest, journal files, catalog Markdown round-trip rules, attachment content-addressing, referential integrity.</span>
+        <span class="grow">download</span></a></li>
+      <li><a href="{{ '/tools/diff-vaults.py' | relative_url }}">
+        <code>diff-vaults.py</code>
+        <span>Semantic equivalence of two vaults, at the spec's stated equivalences — the round-trip test.</span>
+        <span class="grow">download</span></a></li>
+    </ul>
+
+    <figure class="pane">
+      <figcaption>Usage <span class="ref">· needs jsonschema and pyyaml</span></figcaption>
+<pre><span class="c"># Does this vault conform?</span>
+<span class="dir">python3</span> validate-vault.py my-vault/
+<span class="dir">python3</span> validate-vault.py export.canpuff.zip
+
+<span class="c"># Did the round trip lose anything?</span>
+<span class="dir">python3</span> diff-vaults.py before.canpuff.zip after.canpuff.zip --verify-hashes</pre>
+      <p>
+        <code>validate-vault.py</code> exits 0 when the vault conforms, 1 on
+        conformance errors, 2 on usage or environment problems. Warnings are
+        spec-tolerated conditions worth surfacing — dangling references, unknown
+        types — not failures.
+      </p>
+    </figure>
+
+    <div class="note">
+      <div>
+        <b>Testing your own implementation?</b> Point the tools at the
+        <a href="{{ site.repo }}/tree/main/fixtures">conformance fixtures</a>: edge-heavy
+        valid vaults and deliberately broken ones, each with the expected verdict
+        recorded in <code>expected.json</code>, plus <code>run-fixtures.py</code> to
+        check a validator against all of them at once. The fixtures ship in the
+        repository rather than on this site — some of them contain malformed YAML
+        on purpose, which is precisely the sort of thing a site generator refuses
+        to build.
+      </div>
+    </div>
+  </div>
+</section>

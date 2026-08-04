@@ -1,9 +1,65 @@
 # canpuff.org — GitHub Pages (Jekyll) configuration.
-#
+
+title: CanPUFF
+tagline: Cannabis Personal Use File Format
+description: >-
+  An open, documented file format for personal cannabis records. Plain files you
+  own — readable in any text editor, portable between apps, with no account, no
+  API key, and no company that can take them away.
+url: https://canpuff.org
+repo: https://github.com/itr8tech/canpuff.org
+
+markdown: kramdown
+kramdown:
+  input: GFM
+  auto_ids: true
+  syntax_highlighter: rouge
+
 # The conformance fixtures include deliberately malformed catalog files
 # (unterminated / non-mapping YAML front matter) that MUST NOT be fed to
 # Jekyll's front-matter parser — they fail the site build by design of
 # what they test. Fixtures are distributed via the git repository, not
 # the rendered site.
+#
+# README.md is the repository's front page; index.html is the site's. Excluding
+# the README keeps one canonical landing page rather than two near-identical
+# ones competing for the same content.
 exclude:
   - fixtures/
+  - README.md
+
+# Layouts and per-document metadata are assigned here rather than in front
+# matter, so the specification files stay pure Markdown for the people who read
+# them in a text editor, in git, or on GitHub.
+defaults:
+  - scope: { path: "canpuff-v1.md" }
+    values:
+      layout: doc
+      nav: core
+      title: "Core specification"
+      status: "1.0-rc · frozen"
+      description: >-
+        The CanPUFF v1 core format: vault layout, the JSONL journal, Markdown
+        catalog cards, attachments, identifiers, units, import merging, and the
+        extension mechanism.
+  - scope: { path: "canpuff-sealed-v1.md" }
+    values:
+      layout: doc
+      nav: sealed
+      title: "Sealed vault profile"
+      status: "draft r2"
+      pill: "pill--draft"
+      description: >-
+        End-to-end encryption for CanPUFF vaults: age v1 envelopes, a BIP39
+        mnemonic key hierarchy, and a synchronization protocol for dumb file
+        servers.
+  - scope: { path: "mapping-pufftab-ios.md" }
+    values:
+      layout: doc
+      nav: mapping
+      title: "PuffTab iOS mapping"
+      status: "draft"
+      pill: "pill--draft"
+      description: >-
+        Field-by-field lossless mapping between the PuffTab iOS SwiftData model
+        and CanPUFF v1 — the conformance contract for the first implementation.

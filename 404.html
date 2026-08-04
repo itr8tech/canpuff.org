@@ -1,0 +1,29 @@
+---
+layout: page
+permalink: /404.html
+title: "Not found"
+description: "That page is not part of this vault."
+---
+
+<section class="hero">
+  <div class="wrap">
+    <p class="eyebrow">404 · dangling reference</p>
+    <h1>Not in the catalog.<br>Not in the journal either.</h1>
+    <p class="lede">
+      Readers are required to tolerate dangling references and treat them as
+      “unknown” rather than as errors — so let's do that. No hard feelings.
+    </p>
+    <div class="cta">
+      <a class="btn btn--primary" href="{{ '/' | relative_url }}">
+        Back to the front page <span class="arrow" aria-hidden="true">→</span>
+      </a>
+      <a class="btn btn--ghost" href="{{ '/canpuff-v1.html' | relative_url }}">Core specification</a>
+      <a class="btn btn--ghost" href="{{ '/schemas/' | relative_url }}">Schemas</a>
+    </div>
+    <blockquote class="quote">
+      <strong>Core §2:</strong> References between objects are by <code>id</code>.
+      Readers MUST tolerate dangling references — the referenced record may not
+      have synced yet, or may have been deleted.
+    </blockquote>
+  </div>
+</section>

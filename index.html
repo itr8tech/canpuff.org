@@ -1,0 +1,297 @@
+---
+layout: page
+nav: home
+---
+
+<section class="hero">
+  <div class="wrap">
+    <p class="eyebrow">Open standard · v1.0-rc · July 2026</p>
+    <h1>A file format for <span class="gr">personal cannabis records</span>.</h1>
+    <p class="lede">
+      CanPUFF documents the data an individual creates when they track what they
+      consume, what they have, where they got it, and how it affected them. It is
+      a format for <em>people</em>, not businesses — and it is designed to outlive
+      any application, including the ones its authors write.
+    </p>
+
+    <div class="cta">
+      <a class="btn btn--primary" href="{{ '/canpuff-v1.html' | relative_url }}">
+        Read the core specification <span class="arrow" aria-hidden="true">→</span>
+      </a>
+      <a class="btn btn--ghost" href="{{ '/schemas/' | relative_url }}">Browse the JSON Schemas</a>
+      <a class="btn btn--ghost" href="{{ site.repo }}">GitHub <span aria-hidden="true">↗</span></a>
+    </div>
+
+    <blockquote class="quote">
+      <strong>Think “RSS for personal cannabis data”:</strong> plain files you own,
+      readable in any text editor, portable between apps, with no account, no API
+      key, and no company that can take them away.
+    </blockquote>
+
+    <dl class="stats">
+      <div><dt>Round-tripped</dt><dd>1,752 <span class="unit">records</span></dd></div>
+      <div><dt>Attachments</dt><dd>239 <span class="unit">photos</span></dd></div>
+      <div><dt>Implementations</dt><dd>2</dd></div>
+      <div><dt>Fields lost</dt><dd>0</dd></div>
+    </dl>
+  </div>
+</section>
+
+<section class="section section--sunk">
+  <div class="wrap">
+    <p class="eyebrow">The gap</p>
+    <h2>Every part of the supply chain has a data standard. The person at the end of it has none.</h2>
+    <p>
+      Seed-to-sale systems, dispensary point-of-sale, and regulatory traceability
+      are all standardised and interoperable. Meanwhile every consumer tracking app
+      keeps its records in an undocumented internal database — so the data dies with
+      the app, and years of personal history go with it.
+    </p>
+    <p>
+      CanPUFF is the missing half: a documented, implementable format for the
+      consumer's own records, published under CC0, with conformance fixtures so a
+      second implementation can prove it agrees with the first.
+    </p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <p class="eyebrow">The documents</p>
+    <h2>What is specified, and how firm it is.</h2>
+
+    <div class="cards">
+      <article class="card">
+        <div class="card__top">
+          <h3><a href="{{ '/canpuff-v1.html' | relative_url }}">Core specification</a></h3>
+          <span class="pill">1.0-rc</span>
+        </div>
+        <code>canpuff-v1.md</code>
+        <p>
+          The vault layout, the journal (JSONL events), the catalog (Markdown +
+          YAML frontmatter cards), attachments, identifiers, units, import
+          merging, and the extension mechanism.
+        </p>
+        <p class="meta">Frozen · 12 sections</p>
+      </article>
+
+      <article class="card">
+        <div class="card__top">
+          <h3><a href="{{ '/canpuff-sealed-v1.html' | relative_url }}">Sealed vault profile</a></h3>
+          <span class="pill pill--draft">draft r2</span>
+        </div>
+        <code>canpuff-sealed-v1.md</code>
+        <p>
+          End-to-end encryption with age v1, a key hierarchy rooted in a BIP39
+          mnemonic, and a synchronisation protocol that works against a dumb file
+          server which never sees plaintext.
+        </p>
+        <p class="meta">Under active development</p>
+      </article>
+
+      <article class="card">
+        <div class="card__top">
+          <h3><a href="{{ '/mapping-pufftab-ios.html' | relative_url }}">PuffTab iOS mapping</a></h3>
+          <span class="pill pill--draft">draft</span>
+        </div>
+        <code>mapping-pufftab-ios.md</code>
+        <p>
+          Field by field, lossless, both directions: how the first
+          implementation's 13-entity SwiftData model becomes CanPUFF and comes
+          back unchanged.
+        </p>
+        <p class="meta">Conformance contract</p>
+      </article>
+
+      <article class="card">
+        <div class="card__top">
+          <h3><a href="{{ '/schemas/' | relative_url }}">JSON Schemas</a></h3>
+          <span class="pill">1.0-rc</span>
+        </div>
+        <code>schemas/v1/&lt;type&gt;.json</code>
+        <p>
+          JSON Schema 2020-12 for every object type, served at the canonical
+          <code>$id</code> URLs. Normative for the JSON form.
+        </p>
+        <p class="meta">11 schemas</p>
+      </article>
+
+      <article class="card">
+        <div class="card__top">
+          <h3><a href="{{ '/examples/' | relative_url }}">Examples</a></h3>
+          <span class="pill">1.0-rc</span>
+        </div>
+        <code>examples/</code>
+        <p>
+          A complete example plain vault, plus one standalone JSON object per
+          type that validates against the schemas.
+        </p>
+        <p class="meta">Copy-paste starting points</p>
+      </article>
+
+      <article class="card">
+        <div class="card__top">
+          <h3><a href="{{ site.repo }}/tree/main/fixtures">Conformance fixtures <span aria-hidden="true">↗</span></a></h3>
+          <span class="pill">1.0-rc</span>
+        </div>
+        <code>fixtures/</code>
+        <p>
+          Edge-heavy valid vaults and deliberately broken ones, each with the
+          reference validator's expected verdict, plus a runner. This is what
+          makes a third-party implementation testable.
+        </p>
+        <p class="meta">Distributed via git, not the site</p>
+      </article>
+
+      <article class="card">
+        <div class="card__top">
+          <h3><a href="{{ '/tools/' | relative_url }}">Reference tooling</a></h3>
+          <span class="pill pill--tool">python</span>
+        </div>
+        <code>tools/</code>
+        <p>
+          <code>validate-vault.py</code> for conformance and
+          <code>diff-vaults.py</code> for semantic equivalence of two vaults.
+          Standalone, no dependencies; both accept a directory or a
+          <code>.canpuff.zip</code>.
+        </p>
+        <p class="meta">Round-trip verification</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="section section--sunk">
+  <div class="wrap">
+    <p class="eyebrow">At a glance</p>
+    <h2>The whole format is a directory you can read without us.</h2>
+    <p>
+      Two tiers: a private <strong>journal</strong> of events, and a shareable
+      <strong>catalog</strong> of documents. Binary files are content-addressed by
+      SHA-256. Nothing else.
+    </p>
+
+    <figure class="pane">
+      <figcaption>The plain vault <span class="ref">· Core §3</span></figcaption>
+<pre>&lt;vault&gt;/
+  <span class="dir">manifest.json</span>                    <span class="c">REQUIRED  vault identity &amp; format version</span>
+  <span class="dir">journal/</span>
+    &lt;YYYY&gt;/&lt;MM&gt;.jsonl              <span class="c">journal events, one JSON object per line</span>
+  <span class="dir">catalog/</span>
+    supplies/&lt;id&gt;.md               <span class="c">shops · chains · brands · producers</span>
+    methods/&lt;id&gt;.md                <span class="c">tax-rates · terpenes</span>
+  <span class="dir">attachments/</span>
+    &lt;hh&gt;/&lt;sha256&gt;.&lt;ext&gt;            <span class="c">content-addressed binary files</span>
+  <span class="dir">apps/</span>
+    &lt;app-id&gt;/...                   <span class="c">application-private data, carried through intact</span></pre>
+      <p>Readers must tolerate unknown files and directories, so the format can grow without breaking anything.</p>
+    </figure>
+
+    <div class="panes">
+      <figure class="pane">
+        <figcaption>A journal event <span class="ref">· journal/2026/07.jsonl</span></figcaption>
+<pre>{
+  <span class="na">"type"</span><span class="p">:</span> <span class="s2">"consumption"</span><span class="p">,</span>
+  <span class="na">"version"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+  <span class="na">"id"</span><span class="p">:</span> <span class="s2">"7c9e6679-7425-40de-944b-e07fc1f90ae7"</span><span class="p">,</span>
+  <span class="na">"at"</span><span class="p">:</span> <span class="s2">"2026-07-09T16:20:00-07:00"</span><span class="p">,</span>
+  <span class="na">"supply"</span><span class="p">:</span> <span class="s2">"9f3c1a2e-7b41-4c8e-9d2a-51f08c77b3aa"</span><span class="p">,</span>
+  <span class="na">"amount"</span><span class="p">:</span> <span class="p">{</span> <span class="na">"grams"</span><span class="p">:</span> <span class="mi">0.35</span> <span class="p">},</span>
+  <span class="na">"shared"</span><span class="p">:</span> <span class="p">{</span> <span class="na">"people"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="na">"gift"</span><span class="p">:</span> <span class="kc">false</span> <span class="p">},</span>
+  <span class="na">"effects"</span><span class="p">:</span> <span class="p">{</span> <span class="na">"rating"</span><span class="p">:</span> <span class="mi">7</span> <span class="p">},</span>
+  <span class="na">"notes"</span><span class="p">:</span> <span class="s2">"Paired with a movie."</span>
+}</pre>
+        <p>Pretty-printed here; on disk it is one line. Private by default — journal data never leaves a trusted device unencrypted.</p>
+      </figure>
+
+      <figure class="pane">
+        <figcaption>A catalog card <span class="ref">· catalog/supplies/9f3c….md</span></figcaption>
+<pre><span class="p">---</span>
+<span class="na">type</span><span class="p">:</span> <span class="s">supply</span>
+<span class="na">version</span><span class="p">:</span> <span class="mi">1</span>
+<span class="na">id</span><span class="p">:</span> <span class="s">9f3c1a2e-7b41-4c8e-9d2a-51f08c77b3aa</span>
+<span class="na">name</span><span class="p">:</span> <span class="s">Pink Kush</span>
+<span class="na">variety</span><span class="p">:</span> <span class="s">indica</span>
+<span class="na">thc</span><span class="p">:</span> <span class="mi">22.5</span>
+<span class="na">terpenes</span><span class="p">:</span>
+  <span class="p">- {</span> <span class="na">name</span><span class="p">:</span> <span class="s">Myrcene</span><span class="p">,</span> <span class="na">percentage</span><span class="p">:</span> <span class="mi">0.8</span> <span class="p">}</span>
+<span class="na">grams</span><span class="p">:</span> <span class="mi">2.1</span>
+<span class="na">cost</span><span class="p">:</span> <span class="mi">29.99</span>
+<span class="na">currency</span><span class="p">:</span> <span class="s">CAD</span>
+<span class="p">---</span>
+
+Dense buds, gassy. Better in the bong than rolled.
+Second time buying — first batch was drier.</pre>
+        <p>Opens in any text editor, and natively in Obsidian. Contains nothing about the user's behaviour, so it is safe to share.</p>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <p class="eyebrow">Design principles</p>
+    <h2>Seven decisions that explain most of the spec.</h2>
+
+    <ol class="principles">
+      <li>
+        <h3>File over app</h3>
+        <p>The format is the product. Applications — including PuffTab — are replaceable CRUD interfaces over it.</p>
+      </li>
+      <li>
+        <h3>Journal / catalog split</h3>
+        <p>Events are private by default and never leave the user's control unencrypted. Product, shop and brand records contain nothing personal and are inherently shareable.</p>
+      </li>
+      <li>
+        <h3>Human-legible where a human might look</h3>
+        <p>Catalog cards are Markdown with YAML frontmatter. The journal is JSONL — still greppable, built for machines.</p>
+      </li>
+      <li>
+        <h3>Machine-exact where machines interoperate</h3>
+        <p>The canonical data model is JSON, specified by JSON Schema. Interchange, QR payloads and validation always use the JSON form.</p>
+      </li>
+      <li>
+        <h3>Private by architecture, not policy</h3>
+        <p>Consumption records are health data and, in some jurisdictions, self-incriminating. The format treats that as a design input, not a disclaimer.</p>
+      </li>
+      <li>
+        <h3>Extensible without forking</h3>
+        <p>Unknown fields are ignored, exactly one blessed extension mechanism exists, and every object carries <code>type</code> and <code>version</code>.</p>
+      </li>
+      <li>
+        <h3>Boring on purpose</h3>
+        <p>UUIDs, RFC 3339, SHA-256, JSON Schema, age encryption. No invented primitives, no clever tricks to regret later.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<section class="section section--sunk">
+  <div class="wrap">
+    <p class="eyebrow">Status &amp; governance</p>
+    <h2>Frozen where it counts, open where it should be.</h2>
+    <p>
+      The core format is a <strong>v1.0 release candidate</strong>: frozen, standing
+      on a five-lens adversarial review with 83 findings applied, and a proven
+      lossless round-trip of real data between two independent implementations —
+      the PuffTab iOS app and the PuffTab web app. Breaking changes now require a
+      demonstrated interoperability failure; additive proposals target v1.1 under
+      the versioning rules in <a href="{{ '/canpuff-v1.html#10-versioning-of-this-specification' | relative_url }}">Core §10</a>.
+      The sealed profile remains a draft, and v1.0 <em>final</em> follows its validation.
+    </p>
+    <p>
+      Spec text and schemas are published under <strong>CC0-1.0</strong>, with an
+      OWFa 1.0 patent non-assertion covering implementations. Feedback,
+      implementations and proposals are all welcome — the
+      <a href="{{ '/canpuff-v1.html#9-extensions' | relative_url }}">extension mechanism</a>
+      is the intended first stop for a new need, and fields that prove themselves
+      in <code>ext</code> are candidates for the next minor version.
+    </p>
+    <div class="cta">
+      <a class="btn btn--primary" href="{{ site.repo }}/issues">
+        Open an issue <span class="arrow" aria-hidden="true">→</span>
+      </a>
+      <a class="btn btn--ghost" href="{{ site.repo }}/tree/main/fixtures">Run the conformance fixtures</a>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,46 @@
+---
+layout: base
+---
+<main class="wrap docgrid" id="main">
+
+  <div class="dochead">
+    <p class="crumbs">
+      <a href="{{ '/' | relative_url }}">canpuff.org</a>
+      <span class="sep" aria-hidden="true">/</span>
+      <span>{{ page.title }}</span>
+      {% if page.status %}<span class="pill{% if page.pill %} {{ page.pill }}{% endif %}">{{ page.status }}</span>{% endif %}
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="{{ site.repo }}/blob/main/{{ page.path }}">source&#8239;<span aria-hidden="true">↗</span></a>
+    </p>
+  </div>
+
+  {% assign sections = content | split: '<h2 id="' %}
+  {% if sections.size > 2 %}
+  <nav class="toc" aria-labelledby="toc-heading">
+    <h2 id="toc-heading">On this page</h2>
+    <ol>
+      {% for s in sections offset:1 %}
+        {% assign id = s | split: '"' | first %}
+        {% assign label = s | split: '</h2>' | first | remove_first: id | remove_first: '">' | strip_html | strip %}
+        <li><a href="#{{ id }}">{{ label }}</a>
+        {% assign subs = s | split: '<h3 id="' %}
+        {% if subs.size > 1 %}
+          <ol>
+            {% for t in subs offset:1 %}
+              {% assign sid = t | split: '"' | first %}
+              {% assign slabel = t | split: '</h3>' | first | remove_first: sid | remove_first: '">' | strip_html | strip %}
+              <li><a href="#{{ sid }}">{{ slabel }}</a></li>
+            {% endfor %}
+          </ol>
+        {% endif %}
+        </li>
+      {% endfor %}
+    </ol>
+  </nav>
+  {% endif %}
+
+  <article class="doc">
+    {{ content }}
+  </article>
+
+</main>
