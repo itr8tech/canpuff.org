@@ -174,4 +174,6 @@ PWA and future iOS versions MUST be able to ingest the current single-JSON expor
 
 Native Cannabinoid/SupplyCannabinoid records map to the v1 cannabinoid dictionary and supply concentration collection. Legacy percent fields remain stored for older databases; a supply without an authored collection reads them through a multiply-by-10 adapter. An authored empty collection suppresses legacy fallback. Both concentration readings are optional. Cultivar/lineage map directly; tip uses the supply currency and is included once after tax. Original THC/CBD snapshots are preserved as originalUnspecifiedMgPerGram, never reinterpreted as as-sold readings.
 
+The optional native `receiptNumber` maps directly to the supply's `receiptNumber` text field, preserving leading zeroes and letters. It is omitted from privacy-trimmed sharing unless purchase details are explicitly included.
+
 The native Type picker and the PWA Type selector edit the same optional `variety` field. Both present Cultivar / strain and Lineage as optional product details, separate from the main supply name.
