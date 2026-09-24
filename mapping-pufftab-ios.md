@@ -39,7 +39,7 @@ Conventions used below:
 | `id` | `id` |
 | `name` | `name` |
 | `shortName` | `shortName` (empty → omit) |
-| `varietyRaw` ("Hybrid"/"Indica"/"Sativa") | `variety` lowercased (`hybrid`/`indica`/`sativa`). If the stored string (lowercased) is not one of the three, omit `variety` and preserve the raw string as `ext.pufftab.varietyRaw`; importers restore it verbatim |
+| `varietyRaw` ("Hybrid"/"Indica"/"Sativa" or empty) | `variety` lowercased (`hybrid`/`indica`/`sativa`). An empty string means Not specified and exports no `variety`; an absent `variety` imports as empty, never Hybrid. If a nonempty stored string (lowercased) is not one of the three, omit `variety` and preserve the raw string as `ext.pufftab.varietyRaw`; importers restore it verbatim |
 | `thc`, `cbd` | `thc`, `cbd` |
 | `originalTHC`, `originalCBD` | `originalThc`, `originalCbd` |
 | `totalTerpenes` | `totalTerpenes` |
@@ -168,3 +168,10 @@ PWA and future iOS versions MUST be able to ingest the current single-JSON expor
 - **N4 — terpene identity:** terpene names (Myrcene, Limonene…) are the interchange key; per-app dictionary row UUIDs are not portable across apps that seed their own dictionaries.
 - **N5 — empty strings (global):** every iOS non-optional `String` whose value is the empty string is **omitted** on export; importers materialize absent string fields as `""`. Explicit empty strings in incoming documents are equivalent to absent. (This subsumes the per-field notes above.)
 - **N6 — precision & bounds (global):** values exceeding spec precision are rounded half-even to the permitted places (grams 4dp, money/percent 2dp) with the exact original preserved under **flat dotted ext keys** (`ext.pufftab["exact.thc"]`, `exact.grams`, … — the Core §6.2 ext profile forbids nested objects); values outside schema bounds (percent > 100, `effects.rating` outside 1–10 — `Puff.effectiveness` is an unconstrained Int — `yearFounded` 1–999) are omitted from the core field and carried verbatim in `ext.pufftab`.
+
+
+## September 23, 2026 cannabinoid migration
+
+Native Cannabinoid/SupplyCannabinoid records map to the v1 cannabinoid dictionary and supply concentration collection. Legacy percent fields remain stored for older databases; a supply without an authored collection reads them through a multiply-by-10 adapter. An authored empty collection suppresses legacy fallback. Both concentration readings are optional. Cultivar/lineage map directly; tip uses the supply currency and is included once after tax. Original THC/CBD snapshots are preserved as originalUnspecifiedMgPerGram, never reinterpreted as as-sold readings.
+
+The native Type picker and the PWA Type selector edit the same optional `variety` field. Both present Cultivar / strain and Lineage as optional product details, separate from the main supply name.

@@ -37,7 +37,7 @@ defaults:
       layout: doc
       nav: core
       title: "Core specification"
-      status: "1.0-rc · frozen"
+      status: "1.0-rc · September 2026 revision"
       description: >-
         The CanPUFF v1 core format: vault layout, the JSONL journal, Markdown
         catalog cards, attachments, identifiers, units, import merging, and the

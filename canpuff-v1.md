@@ -1,6 +1,6 @@
 # CanPUFF: Cannabis Personal Use File Format — Core Specification
 
-**Version 1.0-rc (2026-07-11)** — the core format is frozen as a release candidate.
+**Version 1.0-rc (revised 2026-09-23)** — see the dated v1 revision for cannabinoids and purchase details below.
 **Media type:** `application/canpuff+json` · **Format identifier:** `canpuff`
 **License:** spec text and schemas CC0-1.0; OWFa 1.0 patent non-assert.
 
@@ -41,7 +41,7 @@ Every CanPUFF object, in any tier, MUST carry:
 Additionally:
 
 - **Timestamps** MUST be RFC 3339 strings with a UTC offset (e.g. `2026-07-09T16:20:00-07:00`). A numeric offset (`±HH:MM`) or `Z` is acceptable; `Z` and `-00:00` indicate that local offset was unknown or not recorded. Writers SHOULD prefer the numeric local offset — time-of-day is analytically meaningful for consumption data. Date-only values use `YYYY-MM-DD`.
-- **Quantities of cannabis** are decimal numbers of **grams** with at most 4 decimal places. Potencies (`thc`, `cbd`, terpene percentages) are percentages by weight, `0`–`100`, at most 2 decimal places.
+- **Quantities of cannabis** are decimal numbers of **grams** with at most 4 decimal places. Cannabinoid concentrations are mg/g, `0`–`1000`, at most 4 decimal places. Legacy `thc`/`cbd` and terpene percentages remain percentages by weight, `0`–`100`, at most 2 decimal places.
 - **Money** is a decimal number with at most 2 decimal places; an object carrying `cost` MUST also carry `currency` (ISO 4217 code). The schemas enforce the pairing.
 - Writers MUST emit numbers within the stated precision; readers SHOULD parse monetary and gram values into decimal (not binary-float) types where the platform allows. Precision limits are writer requirements; the schemas intentionally do not assert them (IEEE-754 `multipleOf` is unreliable).
 - `created` and `updated` (RFC 3339) are OPTIONAL on every object; writers that edit records SHOULD maintain `updated`.
@@ -67,6 +67,7 @@ A plain vault is a directory (or a ZIP archive of one — see §8):
     methods/<id>.md
     tax-rates/<id>.md
     terpenes/<id>.md
+    cannabinoids/<id>.md
   attachments/
     <hh>/<sha256>.<ext>            content-addressed binary files (§7)
   apps/
@@ -163,7 +164,9 @@ Rationale: for the user's own supply, a gifted amount left their supply but not 
 Implementations SHOULD be able to display dose in NIH standard THC units (1 unit = 5 mg Δ9-THC):
 
 ```
-thcUnits = userGrams × (supply.thc / 100) × 1000 / 5
+thcUnits = userGrams × thcMgPerGram / 5
+# Prefer THC totalMgPerGram, then unspecifiedMgPerGram, then asSoldMgPerGram.
+# Only if cannabinoids is absent: thcMgPerGram = legacy supply.thc × 10.
 ```
 
 This value is derived and MUST NOT be stored as an authoritative field.
@@ -188,6 +191,7 @@ Catalog records are documents. In the vault they are stored as **Markdown files 
 | `method` | `catalog/methods/` |
 | `tax-rate` | `catalog/tax-rates/` |
 | `terpene` | `catalog/terpenes/` |
+| `cannabinoid` | `catalog/cannabinoids/` |
 
 This set is closed for spec v1: extension catalog record types are not permitted under `catalog/` — applications needing new document kinds MUST use `apps/<app-id>/` (§9.2) until the type is standardized. Readers MUST tolerate (and preserve) unknown directories under `catalog/` without interpreting them.
 
@@ -197,14 +201,19 @@ A purchased (or received) package of product.
 
 | Field | Type | Meaning |
 |---|---|---|
-| `name` | string | REQUIRED. Product/strain name. |
+| `name` | string | REQUIRED. Product name or the user’s name for this supply. It may coincide with the cultivar but does not have to. |
 | `shortName` | string | Nickname for quick entry / voice. |
-| `variety` | string | One of `indica`, `sativa`, `hybrid`. |
-| `thc`, `cbd` | percent | Current potency (user-editable). |
-| `originalThc`, `originalCbd` | percent | As stated on the package at purchase. |
+| `variety` | string | OPTIONAL retail category: `indica`, `sativa`, or `hybrid`. Displayed as **Type**. Absent means **Not specified**, never an assumed Hybrid. |
+| `cannabinoids` | array | Named concentrations in mg/g, with separate optional as-sold and total readings; see the September 23 v1 revision below. |
+| `thc`, `cbd` | percent | Legacy current potency; used only when `cannabinoids` is absent. |
+| `originalThc`, `originalCbd` | percent | Legacy original snapshots; chemical basis is unspecified. |
 | `terpenes` | array | `[{ "name": "Myrcene", "percentage": 0.8 }, …]`. Names SHOULD use conventional terpene names; `totalTerpenes` (percent) MAY state the package total. |
 | `grams` | grams | Current remaining amount. **Authoritative** (users adjust for spillage/drift). Writers apply consumption per §4.1; applications MUST NOT recompute this field from the event history except as an explicitly user-invoked repair. |
 | `gramsStart` | grams | Package size at acquisition. |
+| `cultivar` | text | OPTIONAL cultivar/strain name reported for the product. Distinct from its marketing name. |
+| `lineage` | text | OPTIONAL reported parentage or breeding ancestry, commonly `Parent A × Parent B`. Free text; no inferred relationships. |
+| `receiptNumber` | text | OPTIONAL private purchase metadata; preserve leading zeros and letters. |
+| `tip` | money | Optional gratuity, requiring `currency`; added after tax. |
 | `cost` | money | Pre-tax cost. `currency`: ISO 4217 (REQUIRED when `cost` present). |
 | `taxes` | array of uuid | References to `tax-rate` records applied to this purchase. |
 | `purchased`, `packaged` | date/timestamp | Acquisition and packaging dates. |
@@ -218,7 +227,11 @@ A purchased (or received) package of product.
 | `sharedSupply` | boolean | This is someone else's supply the user partakes from. Inverts gift math (§4.1.1). Default false. |
 | `notes` | string | In the Markdown form, this is the document body. |
 
-Derived values (`costPerGram = cost / gramsStart`, cost with taxes, freshness) MUST NOT be stored; the formulas above and the referenced `tax-rate` records make them reproducible.
+User interfaces SHOULD label `variety` as **Type** and offer **Not specified** for unknown values. Writers MUST omit `variety` when unspecified; neither an empty string nor `"unspecified"` is a valid serialized enum member. Readers MUST NOT substitute `hybrid` for an absent value. Existing explicit values remain unchanged. The data key remains `variety` for compatibility; the record discriminator `type: supply` has a different purpose and is unchanged.
+
+User interfaces SHOULD label `cultivar` as **Cultivar / strain**, keep it and **Lineage** optional under product details, and may use `Parent A × Parent B` as the lineage input hint. `name` is the primary product/supply identifier; consumers MUST NOT require users to repeat it as `cultivar`. These fields record supplied descriptions, not verified genetic identity. Neither parentage, retail category, nor cannabinoid concentrations should be inferred from a product or cultivar name.
+
+Derived values (`costPerGram = (cost + tip) / gramsStart`, cost with taxes, freshness) MUST NOT be stored; the formulas above and the referenced `tax-rate` records make them reproducible.
 
 ### 5.2 `shop`, `chain`
 
@@ -380,3 +393,20 @@ Whole-file application data (settings, caches, app-specific histories) lives und
 - `.canpuff.zip` — a zipped plain vault (§8).
 - Schema URLs: `https://canpuff.org/schemas/v1/<type>.json` (canpuff.org is the spec's canonical home).
 - JSON-LD: a future informative `@context` document will map CanPUFF field names to IRIs to permit ActivityStreams-style projections; nothing in this spec requires JSON-LD processing.
+
+
+### September 23, 2026 v1 revision: cannabinoids and purchase details
+
+This revision retains record `version: 1` and manifest `specVersion: 1` by the format author's decision. Earlier v1 vaults remain readable. Earlier implementations may not understand cannabinoid catalog records or edits to the new fields; forward editing compatibility is not guaranteed.
+
+A `cannabinoid` dictionary record lives in `catalog/cannabinoids/<id>.md`, with the common identity/timestamp fields, required `name`, and optional `notes` body. THC and CBD are default dictionary names; other names are permitted. As with terpenes, names in supplies are self-contained and dictionary records may be deduplicated by case-insensitive, whitespace-trimmed name. Dictionary names SHOULD be unique after normalization. A tombstone uses the usual catalog rules.
+
+Supplies MAY contain `cannabinoids`, an array of flat objects with `name` and optional `asSoldMgPerGram`, `totalMgPerGram`, `unspecifiedMgPerGram`, and `originalUnspecifiedMgPerGram`. All concentrations are decimals in mg/g, 0–1000 inclusive, at most four decimal places. A name MUST occur at most once ignoring case and surrounding whitespace. Missing means unknown, not zero. Summary views SHOULD omit a cannabinoid entry when it has no current reading, while preserving its stored data. An explicitly recorded zero is a reading and MUST NOT be treated as missing. `totalMgPerGram` is potential concentration including conversion of precursors; it MUST NOT be added to the as-sold value. Do not calculate totals for custom cannabinoids automatically.
+
+`unspecifiedMgPerGram` preserves historical potency whose chemical basis is unknown. `originalUnspecifiedMgPerGram` preserves the original historical snapshot, not an as-sold measurement. Legacy `thc`, `cbd`, `originalThc`, and `originalCbd` ALWAYS mean percent by mass. Readers convert these by multiplying by exactly 10 ONLY when the entire `cannabinoids` collection is absent. A present collection, including `[]`, takes precedence. Never infer units from numeric magnitude. New writers SHOULD use the collection; retained legacy fields are compatibility/provenance only and MUST NOT override it.
+
+Example: `[{"name":"THC","asSoldMgPerGram":8,"totalMgPerGram":250},{"name":"CBG","totalMgPerGram":12}]`. The two THC readings are separate; neither is a package dose or absorbed dose. Derived THC estimates select total, then unspecified legacy concentration, then as-sold, without adding them. This preserves old calculations but does not assert that an unspecified reading measured total THC.
+
+Supplies MAY also contain optional text `cultivar` and `lineage`, and optional nonnegative monetary `tip` (at most two decimal places). A tip requires `currency`, shared with `cost`. Total paid is `cost + tax on cost + tip`; missing cost/tip contribute zero to arithmetic, without implying an unknown cost was recorded as zero. Tip is not part of the tax base. Privacy-trimmed sharing MUST omit tip unless purchase costs are explicitly included.
+
+Supplies MAY contain `receiptNumber`, optional text preserving leading zeroes and letters. It is private purchase metadata and MUST be omitted from privacy-trimmed sharing unless purchase details are explicitly included.

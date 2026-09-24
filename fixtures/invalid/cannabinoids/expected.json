@@ -1,0 +1,7 @@
+{
+  "verdict": "FAIL",
+  "errors": [
+    "cannabinoid names must be nonblank and unique"
+  ],
+  "warnings": []
+}

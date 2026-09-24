@@ -5,7 +5,7 @@ nav: home
 
 <section class="hero">
   <div class="wrap">
-    <p class="eyebrow">Open standard · v1.0-rc · July 2026</p>
+    <p class="eyebrow">Open standard · v1.0-rc · September 2026 revision</p>
     <h1>A file format for <span class="gr">personal cannabis records</span>.</h1>
     <p class="lede">
       CanPUFF documents the data an individual creates when they track what they
@@ -269,14 +269,14 @@ Second time buying — first batch was drier.</pre>
 <section class="section section--sunk">
   <div class="wrap">
     <p class="eyebrow">Status &amp; governance</p>
-    <h2>Frozen where it counts, open where it should be.</h2>
+    <h2>A release candidate, revised for richer records.</h2>
     <p>
-      The core format is a <strong>v1.0 release candidate</strong>: frozen, standing
-      on a five-lens adversarial review with 83 findings applied, and a proven
-      lossless round-trip of real data between two independent implementations —
-      the PuffTab iOS app and the PuffTab web app. Breaking changes now require a
-      demonstrated interoperability failure; additive proposals target v1.1 under
-      the versioning rules in <a href="{{ '/canpuff-v1.html#10-versioning-of-this-specification' | relative_url }}">Core §10</a>.
+      The core format is a <strong>v1.0 release candidate</strong>. The September 23
+      revision adds named cannabinoids in mg/g, cultivar, lineage, tip, and receipt
+      number within v1. Earlier vaults remain readable; older implementations may
+      not safely edit the new fields or cannabinoid catalog. This revision supersedes
+      the earlier freeze for these changes; future revisions follow the
+      versioning rules in <a href="{{ '/canpuff-v1.html#10-versioning-of-this-specification' | relative_url }}">Core §10</a>.
       The sealed profile remains a draft, and v1.0 <em>final</em> follows its validation.
     </p>
     <p>

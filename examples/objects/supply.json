@@ -5,10 +5,6 @@
   "name": "Pink Kush",
   "shortName": "pink",
   "variety": "indica",
-  "thc": 22.5,
-  "cbd": 0.1,
-  "originalThc": 23.0,
-  "originalCbd": 0.1,
   "terpenes": [
     {
       "name": "Myrcene",
@@ -41,5 +37,25 @@
   "sharedSupply": false,
   "created": "2026-07-02T18:05:00-07:00",
   "updated": "2026-07-09T21:44:00-07:00",
-  "notes": "Dense buds, gassy. Better in the bong than rolled.\nSecond time buying \u2014 first batch was drier."
+  "notes": "Dense buds, gassy. Better in the bong than rolled.\nSecond time buying \u2014 first batch was drier.",
+  "cannabinoids": [
+    {
+      "name": "THC",
+      "asSoldMgPerGram": 8,
+      "totalMgPerGram": 225
+    },
+    {
+      "name": "CBD",
+      "asSoldMgPerGram": 0.1,
+      "totalMgPerGram": 1
+    },
+    {
+      "name": "CBG",
+      "totalMgPerGram": 12
+    }
+  ],
+  "cultivar": "Pink Kush",
+  "lineage": "OG Kush lineage",
+  "tip": 2,
+  "receiptNumber": "000042-A"
 }

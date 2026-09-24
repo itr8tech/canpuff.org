@@ -1,6 +1,6 @@
 # CanPUFF — Cannabis Personal Use File Format
 
-**Version 1.0-rc (July 2026)** · the core format is **frozen as a release candidate**, standing on a five-lens adversarial review (83 findings applied) and a proven lossless round-trip of real data — 1,752 records, 239 photos — between two independent implementations.
+**Version 1.0-rc (revised September 23, 2026)** · a release candidate with named cannabinoids in mg/g and optional product and purchase details. Record and manifest versions remain `1`; legacy percentage data remains readable.
 
 CanPUFF is an open, documented file format for **personal cannabis consumption records** — the data an individual creates when they track what they consume, what they have, where they got it, and how it affected them.
 
@@ -32,6 +32,6 @@ It is a format for *people*, not businesses. Seed-to-sale systems, dispensary po
 
 ## Status & governance
 
-The core format is a **v1.0 release candidate**: frozen, with breaking changes now requiring a demonstrated interoperability failure; additive proposals target v1.1 per the versioning rules (Core §10). The sealed profile remains a draft under active development. The spec text and schemas are published under **CC0-1.0**, with an OWFa 1.0 patent non-assertion covering implementations. Two reference implementations exist and round-trip real data losslessly: the PuffTab iOS app (export/import) and the PuffTab web app (import/export); v1.0 **final** follows validation of the sealed profile.
+The core format is a **v1.0 release candidate**. The September 23 revision adds cannabinoids, cultivar, lineage, tip, and receipt number within v1 by the format author's decision, superseding the earlier freeze for these changes. Earlier vaults remain readable; older implementations may not safely edit the new fields or catalog type. Future revisions follow Core §10. The sealed profile remains a draft under active development. The spec text and schemas are published under **CC0-1.0**, with an OWFa 1.0 patent non-assertion covering implementations. Two reference implementations exist and round-trip real data losslessly: the PuffTab iOS app (export/import) and the PuffTab web app (import/export); v1.0 **final** follows validation of the sealed profile.
 
 Feedback, implementations, and proposals are welcome — the extension mechanism is the intended first stop for new needs; fields that prove themselves in `ext` are candidates for the next minor version.

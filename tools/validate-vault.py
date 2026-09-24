@@ -39,7 +39,7 @@ SCHEMA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "sch
 TYPE_TO_DIR = {
     "supply": "supplies", "shop": "shops", "chain": "chains", "brand": "brands",
     "producer": "producers", "method": "methods", "tax-rate": "tax-rates",
-    "terpene": "terpenes",
+    "terpene": "terpenes", "cannabinoid": "cannabinoids",
 }
 HASHREF = re.compile(r"sha256:([0-9a-f]{64})")
 
@@ -69,6 +69,15 @@ def validate_object(schemas, type_name, obj, where):
     if schema is None:
         warn(f"{where}: unknown type {type_name!r} (tolerated; treated as journal-tier)")
         return
+    if type_name == "supply" and isinstance(obj.get("cannabinoids"), list):
+        names = set()
+        for item in obj["cannabinoids"]:
+            if not isinstance(item, dict):
+                continue
+            name = str(item.get("name", "")).strip().lower()
+            if not name or name in names:
+                err(f"{where}: cannabinoid names must be nonblank and unique ignoring case and surrounding whitespace")
+            names.add(name)
     try:
         jsonschema.validate(obj, schema, format_checker=jsonschema.FormatChecker())
     except jsonschema.ValidationError as e:

@@ -24,7 +24,8 @@
     },
     "name": {
       "type": "string",
-      "minLength": 1
+      "minLength": 1,
+      "description": "Product name or the user’s name for this supply; it need not match cultivar."
     },
     "shortName": {
       "type": "string"
@@ -34,7 +35,8 @@
         "indica",
         "sativa",
         "hybrid"
-      ]
+      ],
+      "description": "Optional retail Type: indica, sativa, or hybrid. Absent means Not specified; never default an absent value to hybrid. The wire key remains variety, separate from the record discriminator type."
     },
     "thc": {
       "$ref": "#/$defs/percent"
@@ -129,6 +131,49 @@
     },
     "notes": {
       "type": "string"
+    },
+    "cultivar": {
+      "type": "string",
+      "description": "Optional cultivar/strain name as reported for the product, independent of its marketing or supply name."
+    },
+    "lineage": {
+      "type": "string",
+      "description": "Optional reported parentage or breeding ancestry, commonly Parent A × Parent B. Free text; not a verified genetic relationship."
+    },
+    "tip": {
+      "$ref": "#/$defs/money"
+    },
+    "cannabinoids": {
+      "type": "array",
+      "description": "Authoritative when present, including an empty array. Names are unique ignoring case and surrounding whitespace.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "asSoldMgPerGram": {
+            "$ref": "#/$defs/concentration"
+          },
+          "totalMgPerGram": {
+            "$ref": "#/$defs/concentration"
+          },
+          "unspecifiedMgPerGram": {
+            "$ref": "#/$defs/concentration"
+          },
+          "originalUnspecifiedMgPerGram": {
+            "$ref": "#/$defs/concentration"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      }
+    },
+    "receiptNumber": {
+      "type": "string",
+      "description": "Purchase receipt identifier; preserve leading zeroes. Private purchase metadata."
     }
   },
   "required": [
@@ -191,10 +236,19 @@
       "additionalProperties": {
         "type": "object"
       }
+    },
+    "concentration": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1000,
+      "description": "mg/g; at most 4 decimal places"
     }
   },
   "dependentRequired": {
     "cost": [
+      "currency"
+    ],
+    "tip": [
       "currency"
     ]
   }
