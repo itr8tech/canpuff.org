@@ -1,6 +1,6 @@
 # CanPUFF: Cannabis Personal Use File Format — Core Specification
 
-**Version 1.0-rc (revised 2026-09-23)** — see the dated v1 revision for cannabinoids and purchase details below.
+**Version 1.0-rc (revised 2026-09-24)** — see the dated v1 revisions for cannabinoids and purchase details below.
 **Media type:** `application/canpuff+json` · **Format identifier:** `canpuff`
 **License:** spec text and schemas CC0-1.0; OWFa 1.0 patent non-assert.
 
@@ -229,7 +229,7 @@ A purchased (or received) package of product.
 
 User interfaces SHOULD label `variety` as **Type** and offer **Not specified** for unknown values. Writers MUST omit `variety` when unspecified; neither an empty string nor `"unspecified"` is a valid serialized enum member. Readers MUST NOT substitute `hybrid` for an absent value. Existing explicit values remain unchanged. The data key remains `variety` for compatibility; the record discriminator `type: supply` has a different purpose and is unchanged.
 
-User interfaces SHOULD label `cultivar` as **Cultivar / strain**, keep it and **Lineage** optional under product details, and may use `Parent A × Parent B` as the lineage input hint. `name` is the primary product/supply identifier; consumers MUST NOT require users to repeat it as `cultivar`. These fields record supplied descriptions, not verified genetic identity. Neither parentage, retail category, nor cannabinoid concentrations should be inferred from a product or cultivar name.
+User interfaces SHOULD label `cultivar` as **Cultivar / strain**, keep it and **Lineage** optional alongside other product identity fields, and may use `Parent A × Parent B` as the lineage input hint. `name` is the primary product/supply identifier; consumers MUST NOT require users to repeat it as `cultivar`. These fields record supplied descriptions, not verified genetic identity. Neither parentage, retail category, nor cannabinoid concentrations should be inferred from a product or cultivar name.
 
 Derived values (`costPerGram = (cost + tip) / gramsStart`, cost with taxes, freshness) MUST NOT be stored; the formulas above and the referenced `tax-rate` records make them reproducible.
 
@@ -399,7 +399,7 @@ Whole-file application data (settings, caches, app-specific histories) lives und
 
 This revision retains record `version: 1` and manifest `specVersion: 1` by the format author's decision. Earlier v1 vaults remain readable. Earlier implementations may not understand cannabinoid catalog records or edits to the new fields; forward editing compatibility is not guaranteed.
 
-A `cannabinoid` dictionary record lives in `catalog/cannabinoids/<id>.md`, with the common identity/timestamp fields, required `name`, and optional `notes` body. THC and CBD are default dictionary names; other names are permitted. As with terpenes, names in supplies are self-contained and dictionary records may be deduplicated by case-insensitive, whitespace-trimmed name. Dictionary names SHOULD be unique after normalization. A tombstone uses the usual catalog rules.
+A `cannabinoid` dictionary record lives in `catalog/cannabinoids/<id>.md`, with the common identity/timestamp fields, required `name`, and optional `notes` body. It MAY include `description`, optional plain text for the full name or a short explanation, separate from the notes body. THC and CBD may suggest Tetrahydrocannabinol and Cannabidiol when description is absent; custom names accept any user-provided description. An explicitly empty description MUST remain empty rather than being replaced by a suggestion. Description is catalog metadata, not a concentration or part of cannabinoid identity. THC and CBD are default dictionary names; other names are permitted. As with terpenes, names in supplies are self-contained and dictionary records may be deduplicated by case-insensitive, whitespace-trimmed name. Dictionary names SHOULD be unique after normalization. A tombstone uses the usual catalog rules.
 
 Supplies MAY contain `cannabinoids`, an array of flat objects with `name` and optional `asSoldMgPerGram`, `totalMgPerGram`, `unspecifiedMgPerGram`, and `originalUnspecifiedMgPerGram`. All concentrations are decimals in mg/g, 0–1000 inclusive, at most four decimal places. A name MUST occur at most once ignoring case and surrounding whitespace. Missing means unknown, not zero. Summary views SHOULD omit a cannabinoid entry when it has no current reading, while preserving its stored data. An explicitly recorded zero is a reading and MUST NOT be treated as missing. `totalMgPerGram` is potential concentration including conversion of precursors; it MUST NOT be added to the as-sold value. Do not calculate totals for custom cannabinoids automatically.
 
@@ -410,3 +410,7 @@ Example: `[{"name":"THC","asSoldMgPerGram":8,"totalMgPerGram":250},{"name":"CBG"
 Supplies MAY also contain optional text `cultivar` and `lineage`, and optional nonnegative monetary `tip` (at most two decimal places). A tip requires `currency`, shared with `cost`. Total paid is `cost + tax on cost + tip`; missing cost/tip contribute zero to arithmetic, without implying an unknown cost was recorded as zero. Tip is not part of the tax base. Privacy-trimmed sharing MUST omit tip unless purchase costs are explicitly included.
 
 Supplies MAY contain `receiptNumber`, optional text preserving leading zeroes and letters. It is private purchase metadata and MUST be omitted from privacy-trimmed sharing unless purchase details are explicitly included.
+
+### September 24, 2026 v1 addition: cannabinoid descriptions
+
+The optional cannabinoid `description` field documented above is separate from notes and supply concentrations. It retains version 1. The suggested THC/CBD full names follow [Health Canada's terminology](https://www.canada.ca/en/health-canada/services/drugs-medication/cannabis/about.html).

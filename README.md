@@ -1,6 +1,6 @@
 # CanPUFF — Cannabis Personal Use File Format
 
-**Version 1.0-rc (revised September 23, 2026)** · a release candidate with named cannabinoids in mg/g and optional product and purchase details. Record and manifest versions remain `1`; legacy percentage data remains readable.
+**Version 1.0-rc (revised September 24, 2026)** · a release candidate with named cannabinoids in mg/g, optional cannabinoid descriptions, and optional product and purchase details. Record and manifest versions remain `1`; legacy percentage data remains readable.
 
 CanPUFF is an open, documented file format for **personal cannabis consumption records** — the data an individual creates when they track what they consume, what they have, where they got it, and how it affected them.
 

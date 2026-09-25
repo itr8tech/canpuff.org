@@ -28,6 +28,10 @@
     },
     "notes": {
       "type": "string"
+    },
+    "description": {
+      "type": "string",
+      "description": "Optional full name or short description, separate from notes. An explicit empty string suppresses a suggested default."
     }
   },
   "required": [

@@ -177,3 +177,5 @@ Native Cannabinoid/SupplyCannabinoid records map to the v1 cannabinoid dictionar
 The optional native `receiptNumber` maps directly to the supply's `receiptNumber` text field, preserving leading zeroes and letters. It is omitted from privacy-trimmed sharing unless purchase details are explicitly included.
 
 The native Type picker and the PWA Type selector edit the same optional `variety` field. Both present Cultivar / strain and Lineage as optional product details, separate from the main supply name.
+
+The optional native `Cannabinoid.descriptionText` maps to `cannabinoid.description`; notes remain separate. An absent description may use the default full names for THC/CBD. Unlike the general empty-string omission rule, an explicitly cleared description exports as `description: ""` to preserve that choice.
