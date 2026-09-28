@@ -150,7 +150,13 @@ Immutable per-day rows (`date` startOfDay, `limitGrams`, `consumedGrams`, `puffC
 
 ## 14. Photos (all `Data` fields) → attachments
 
-Every `photo`/`logo` blob: hash (SHA-256) → write `attachments/<hh>/<sha256>.<ext>` → reference `"sha256:<hex>"`, with `<ext>` sniffed from magic bytes (`jpg`/`png`/`webp`/`heic`, `bin` fallback) — never assumed. The reference exporter recompresses via the app's existing `ImageCompressor` (which strips EXIF, incl. GPS — Core §7) whenever `compressImages` is enabled (the default); `compressImages` **off** is the keep-originals opt-in and exports bytes verbatim. Hashes are computed over the exported (post-recompression) bytes. Base64-embedded photos in JSON exports are **prohibited** in CanPUFF interchange — this replaces the legacy 850 MB single-JSON problem structurally.
+Every `photo`/`logo` blob: hash (SHA-256) → write `attachments/<hh>/<sha256>.<ext>` → reference `"sha256:<hex>"`, with `<ext>` sniffed from magic bytes (`jpg`/`png`/`webp`/`heic`, `bin` fallback) — never assumed.
+
+For full-vault backups, the iOS exporter defaults to **Preserve original photo files**: it exports stored bytes verbatim, independently of the photo-capture compression setting. The export UI explicitly discloses that embedded metadata is retained (the keep-originals choice in Core §7). Users can turn that option off for a smaller export, which recompresses via `ImageCompressor` using the configured quality and maximum pixel dimension and strips EXIF, including GPS, from recompressed images. If an image cannot be decoded, its bytes are retained unchanged.
+
+Single-supply shares retain their separate compression/privacy policy: recompress when `compressImages` is enabled; when disabled, keep the stored original bytes. Hashes always cover the actual exported bytes. Importers preserve attachment bytes; they MUST NOT silently recompress them. This policy avoids cumulative image-quality loss over full-backup/restore cycles and does not change the CanPUFF version or attachment format.
+
+Base64-embedded photos in JSON exports are **prohibited** in CanPUFF interchange — this replaces the legacy 850 MB single-JSON problem structurally.
 
 ## 15. Out of scope
 
