@@ -164,6 +164,12 @@
           },
           "originalUnspecifiedMgPerGram": {
             "$ref": "#/$defs/concentration"
+          },
+          "mgPerUnit": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 10000,
+            "description": "mg per piece for count-based (unit each) products; at most four decimal places. Infused products are already activated, so there is no as-sold/total split."
           }
         },
         "required": [
@@ -174,6 +180,39 @@
     "receiptNumber": {
       "type": "string",
       "description": "Purchase receipt identifier; preserve leading zeroes. Private purchase metadata."
+    },
+    "category": {
+      "enum": [
+        "flower",
+        "preroll",
+        "edible"
+      ],
+      "description": "Optional product category. Absent means Not specified (treated as mass-based, never assumed flower in the UI). Readers MUST tolerate values added by later revisions."
+    },
+    "format": {
+      "type": "string",
+      "description": "Optional free-text product form, e.g. gummy, chocolate, hard candy, capsule, joint, infused pre-roll."
+    },
+    "unit": {
+      "enum": [
+        "g",
+        "each"
+      ],
+      "description": "Measurement basis of the package. Absent or g: grams/gramsStart are the quantity. each: quantity/quantityStart count pieces and grams/gramsStart MUST be absent."
+    },
+    "quantity": {
+      "type": "number",
+      "minimum": 0,
+      "description": "pieces, max 2 decimal places (partial pieces are allowed). Used only when unit is each."
+    },
+    "quantityStart": {
+      "type": "number",
+      "minimum": 0,
+      "description": "pieces, max 2 decimal places (partial pieces are allowed). Used only when unit is each."
+    },
+    "unitGrams": {
+      "$ref": "#/$defs/grams",
+      "description": "Grams per individual pre-roll; with category preroll, pieces remaining = grams / unitGrams. Derived counts are never stored."
     }
   },
   "required": [

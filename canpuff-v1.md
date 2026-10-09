@@ -171,6 +171,23 @@ thcUnits = userGrams × thcMgPerGram / 5
 
 This value is derived and MUST NOT be stored as an authoritative field.
 
+### 4.1.3 Count-based servings (edibles and similar)
+
+For a supply with `unit: each` (§5.1.1) the dose is a number of pieces, not grams. The event records it as `serving` instead of `amount`:
+
+```json
+{ "type": "consumption", "version": 1, "id": "…", "at": "2026-10-08T19:00:00-07:00",
+  "supply": "…", "method": "…", "serving": { "unit": "each", "value": 0.5 } }
+```
+
+- `serving.value` is a number of pieces greater than 0, at most two decimal places (half and quarter pieces are normal). `serving.unit` is `each`.
+- A writer MUST NOT write both `amount` and `serving` on one event. A reader that finds both MUST treat the event as invalid; a validator reports an error.
+- Writing `serving` and omitting `amount` is deliberate: readers that predate this revision see an event with no `amount`, which §4.1.1 already defines as contributing 0 grams. Such readers neither reject nor corrupt the event, and they MUST preserve the unknown field (§2).
+- **Math.** §4.1.1 applies unchanged with pieces in place of grams: `userServing = shared.gift ? (supply.sharedSupply ? serving.value : 0) : serving.value / persons`.
+- **Depletion.** A writer SHOULD decrement the supply's `quantity` by `serving.value` (floored at 0), reversing it on edit or delete, exactly as for `grams` in §4.1.
+- **THC.** `thcMg = userServing × mgPerUnit` for the THC entry; `thcUnits = thcMg / 5`. Derived; never stored.
+- A `serving` against a mass-based supply, or an `amount` against a `unit: each` supply, is a warning, not an error: the event is preserved and its dose is simply not computable.
+
 ### 4.2 Other journal event types
 
 This version defines only `consumption`. Applications needing additional event kinds (e.g. supply adjustments, tolerance-break markers) MUST use extension types (§9.1) until they are standardized.
@@ -230,6 +247,26 @@ A purchased (or received) package of product.
 User interfaces SHOULD label `variety` as **Type** and offer **Not specified** for unknown values. Writers MUST omit `variety` when unspecified; neither an empty string nor `"unspecified"` is a valid serialized enum member. Readers MUST NOT substitute `hybrid` for an absent value. Existing explicit values remain unchanged. The data key remains `variety` for compatibility; the record discriminator `type: supply` has a different purpose and is unchanged.
 
 User interfaces SHOULD label `cultivar` as **Cultivar / strain**, keep it and **Lineage** optional alongside other product identity fields, and may use `Parent A × Parent B` as the lineage input hint. `name` is the primary product/supply identifier; consumers MUST NOT require users to repeat it as `cultivar`. These fields record supplied descriptions, not verified genetic identity. Neither parentage, retail category, nor cannabinoid concentrations should be inferred from a product or cultivar name.
+
+### 5.1.1 Product category and unit
+
+Supplies are mass-based by default. Three optional fields describe other products without disturbing that default:
+
+| Field | Type | Meaning |
+|---|---|---|
+| `category` | string | OPTIONAL. `flower`, `preroll` or `edible`. Absent means **Not specified**; readers MUST NOT substitute `flower`. Readers MUST tolerate (and preserve) values added by later revisions. |
+| `format` | string | OPTIONAL free text, e.g. "gummy", "chocolate", "capsule". |
+| `unit` | string | OPTIONAL. `g` (default) or `each`. |
+| `quantity`, `quantityStart` | number | Pieces remaining and at acquisition; at most two decimal places. Used **only** with `unit: each`. |
+| `unitGrams` | grams | Grams per individual pre-roll. |
+
+Rules:
+
+- With `unit: each`, `grams` and `gramsStart` MUST be absent (one source of truth) and `quantity` is authoritative on the same terms as `grams` (§5.1). Without it, `quantity` and `quantityStart` MUST be absent.
+- With `unit: each`, potency uses `cannabinoids[].mgPerUnit` (mg per piece, 0–10000, at most four decimal places). The as-sold/total split does not apply: infused products are already activated. Missing means unknown, not zero; an explicit zero is a reading. Package total is `mgPerUnit × quantityStart`, derived and never stored. Edibles SHOULD use `unit: each`; mg/g readings on a count-based supply, and `mgPerUnit` on a mass-based one, are warnings.
+- A **pre-roll** stays mass-based: `grams` and `gramsStart` hold the total weight, `unitGrams` the weight of one. Pieces remaining is `grams / unitGrams`, derived and never stored. Potency uses the ordinary mg/g readings, so §4.1.1 and §4.1.2 apply with no change.
+- `unitGrams` is meaningful only with `category: preroll`.
+- A `method` MAY carry `defaultServing` (`{ "unit": "each", "value": n }`, the typical dose it implies for count-based supplies) and `categories` (an array of category strings it applies to; absent or empty means any). Both are hints for user interfaces.
 
 Derived values (`costPerGram = (cost + tip) / gramsStart`, cost with taxes, freshness) MUST NOT be stored; the formulas above and the referenced `tax-rate` records make them reproducible.
 
@@ -414,3 +451,7 @@ Supplies MAY contain `receiptNumber`, optional text preserving leading zeroes an
 ### September 24, 2026 v1 addition: cannabinoid descriptions
 
 The optional cannabinoid `description` field documented above is separate from notes and supply concentrations. It retains version 1. The suggested THC/CBD full names follow [Health Canada's terminology](https://www.canada.ca/en/health-canada/services/drugs-medication/cannabis/about.html).
+
+### October 8, 2026 v1 addition: edibles and pre-rolls
+
+Additive; record `version: 1` and manifest `specVersion: 1` are unchanged. Adds supply `category`, `format`, `unit`, `quantity`, `quantityStart`, `unitGrams`; cannabinoid `mgPerUnit`; consumption `serving`; method `defaultServing` and `categories` (§4.1.3, §5.1.1). Vaults written before this revision remain valid and mean exactly what they did. Earlier implementations should carry the new fields through unread (§2) but cannot compute or edit count-based doses; an edible logged by a newer app appears to them as an event with no amount. The category and unit sets are intentionally small; further product kinds (vapes, concentrates, beverages, oils, topicals) will extend them in later additive revisions.

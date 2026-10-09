@@ -40,6 +40,35 @@
     },
     "notes": {
       "type": "string"
+    },
+    "defaultServing": {
+      "type": "object",
+      "description": "Typical dose this method implies for count-based supplies.",
+      "properties": {
+        "unit": {
+          "const": "each"
+        },
+        "value": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "pieces, max 2 decimal places"
+        }
+      },
+      "required": [
+        "unit",
+        "value"
+      ]
+    },
+    "categories": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "flower",
+          "preroll",
+          "edible"
+        ]
+      },
+      "description": "Optional hint: product categories this method applies to. Empty or absent means any."
     }
   },
   "required": [

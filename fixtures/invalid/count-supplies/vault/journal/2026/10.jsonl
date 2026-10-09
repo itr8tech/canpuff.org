@@ -1,0 +1,2 @@
+{"type":"consumption","version":1,"id":"e1d1b1e0-0000-4000-8000-000000000023","at":"2026-10-08T19:00:00-07:00","supply":"e1d1b1e0-0000-4000-8000-000000000021","amount":{"grams":1},"serving":{"unit":"each","value":1}}
+{"type":"consumption","version":1,"id":"e1d1b1e0-0000-4000-8000-000000000024","at":"2026-10-08T19:30:00-07:00","supply":"e1d1b1e0-0000-4000-8000-000000000021","serving":{"unit":"each","value":0}}

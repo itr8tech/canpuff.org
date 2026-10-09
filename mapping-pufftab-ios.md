@@ -185,3 +185,20 @@ The optional native `receiptNumber` maps directly to the supply's `receiptNumber
 The native Type picker and the PWA Type selector edit the same optional `variety` field. Both present Cultivar / strain and Lineage as optional product details, separate from the main supply name.
 
 The optional native `Cannabinoid.descriptionText` maps to `cannabinoid.description`; notes remain separate. An absent description may use the default full names for THC/CBD. Unlike the general empty-string omission rule, an explicitly cleared description exports as `description: ""` to preserve that choice.
+
+## October 8, 2026 edibles and pre-rolls
+
+Maps the additive fields of Core §4.1.3 and §5.1.1. Flower writes none of them, so existing vaults and exports are byte-identical.
+
+| iOS | CanPUFF |
+|---|---|
+| `Supply.categoryRaw` | `category`. Written verbatim when non-empty and read back verbatim, so a category from a later revision survives a round trip. The app treats an unrecognised value as flower for display only. |
+| `Supply.formatText` | `format` |
+| `Supply.unitRaw` (`"each"`) | `unit: each`; absent otherwise |
+| `Supply.quantity`, `quantityStart` | `quantity`, `quantityStart` (2 dp; exact value in `ext.pufftab["exact.quantity"]` when rounding was lossy). With `unit: each`, `grams` and `gramsStart` are **not written**; `Supply.grams` and `gramsstart` stay 0 in the app. |
+| `Supply.unitGrams` | `unitGrams` (pre-rolls; the supply stays mass-based and keeps `grams`/`gramsStart`) |
+| `SupplyCannabinoid.mgPerUnit` | `cannabinoids[].mgPerUnit` |
+| `Puff.servings` (> 0) | `serving: { "unit": "each", "value": n }`. `amount` is **not written**, and `Puff.grams` stays 0. Exact value in `exact.servings` when rounding was lossy. |
+
+Counted doses live in their own fields rather than reusing `grams`: every gram-based total, daily limit, widget and Watch figure then ignores them instead of miscounting. Gram-based totals deliberately exclude edibles for now.
+

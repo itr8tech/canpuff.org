@@ -64,6 +64,29 @@ def load_schemas() -> dict:
     return schemas
 
 
+def check_supply_units(obj, where):
+    """Core §5.1.1: category / unit consistency for count-based products."""
+    unit = obj.get("unit")
+    if unit == "each":
+        for field in ("grams", "gramsStart"):
+            if field in obj:
+                err(f"{where}: {field} must be absent when unit is each (Core §5.1.1)")
+        for item in obj.get("cannabinoids", []) if isinstance(obj.get("cannabinoids"), list) else []:
+            if isinstance(item, dict) and any(k.endswith("MgPerGram") for k in item):
+                warn(f"{where}: cannabinoid {item.get('name')!r} uses mg/g readings on a unit-each supply; use mgPerUnit (Core §5.1.1)")
+    else:
+        for field in ("quantity", "quantityStart"):
+            if field in obj:
+                err(f"{where}: {field} requires unit each (Core §5.1.1)")
+        for item in obj.get("cannabinoids", []) if isinstance(obj.get("cannabinoids"), list) else []:
+            if isinstance(item, dict) and "mgPerUnit" in item:
+                warn(f"{where}: cannabinoid {item.get('name')!r} has mgPerUnit on a mass-based supply (Core §5.1.1)")
+    if obj.get("category") == "edible" and unit != "each":
+        warn(f"{where}: edible supplies SHOULD use unit each (Core §5.1.1)")
+    if "unitGrams" in obj and obj.get("category") != "preroll":
+        warn(f"{where}: unitGrams is meaningful only with category preroll (Core §5.1.1)")
+
+
 def validate_object(schemas, type_name, obj, where):
     schema = schemas.get(type_name)
     if schema is None:
@@ -78,6 +101,10 @@ def validate_object(schemas, type_name, obj, where):
             if not name or name in names:
                 err(f"{where}: cannabinoid names must be nonblank and unique ignoring case and surrounding whitespace")
             names.add(name)
+    if type_name == "supply":
+        check_supply_units(obj, where)
+    if type_name == "consumption" and "amount" in obj and "serving" in obj:
+        err(f"{where}: a consumption event must not carry both amount and serving (Core §4.1.3)")
     try:
         jsonschema.validate(obj, schema, format_checker=jsonschema.FormatChecker())
     except jsonschema.ValidationError as e:
@@ -115,6 +142,8 @@ def main(root: str) -> int:
     all_ids: set[str] = set()
     refs: list[tuple[str, str, str]] = []      # (where, field, target-id)
     attachment_refs: set[str] = set()
+    supply_units: dict[str, str] = {}              # supply id -> unit (default g)
+    event_shapes: list[tuple[str, str, str]] = []  # (where, supply-id, amount|serving)
 
     def register(obj, where):
         oid = obj.get("id")
@@ -182,6 +211,10 @@ def main(root: str) -> int:
                             for field in ("supply", "method"):
                                 if field in obj:
                                     refs.append((where, field, obj[field]))
+                            if isinstance(obj.get("supply"), str):
+                                for shape in ("amount", "serving"):
+                                    if shape in obj:
+                                        event_shapes.append((where, obj["supply"], shape))
                         elif "." in otype:
                             if "at" not in obj:
                                 err(f"{where}: extension journal events must carry at (Core §9.1)")
@@ -221,6 +254,8 @@ def main(root: str) -> int:
                     err(f"{where}: filename must be <id>.md")
                 validate_object(schemas, otype or expected_type, obj, where)
                 register(obj, where)
+                if otype == "supply" and isinstance(obj.get("id"), str):
+                    supply_units[obj["id"]] = obj.get("unit", "g")
                 for field in ("shop", "brand", "chain", "producer"):
                     if field in obj:
                         refs.append((where, field, obj[field]))
@@ -248,6 +283,14 @@ def main(root: str) -> int:
                     digest = hashlib.sha256(f.read()).hexdigest()
                 if digest != stem:
                     err(f"{rel}: content hash {digest[:12]}… does not match filename")
+
+    # --- event shape vs supply unit (Core §4.1.3) ---
+    for where, supply_id, shape in event_shapes:
+        unit = supply_units.get(supply_id)
+        if unit == "each" and shape == "amount":
+            warn(f"{where}: amount (grams) recorded against a unit-each supply; use serving (Core §4.1.3)")
+        elif unit == "g" and shape == "serving":
+            warn(f"{where}: serving recorded against a mass-based supply; use amount.grams (Core §4.1.3)")
 
     # --- referential integrity (dangling = warning by spec) ---
     for where, field, target in refs:

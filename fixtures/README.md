@@ -38,6 +38,7 @@ python3 run-fixtures.py --update        # maintainers: rewrite expected.json aft
 | `valid/dangling-refs` | Dangling references — supply, method, brand, shop, taxes, attachment — are warnings, never errors. | §2, §7 |
 | `valid/extensions` | `ext` blocks, dotted extension journal types, unrecognized journal types, unknown `catalog/` directories, the `apps/` area, and unknown top-level directories are all tolerated. | §9, §3, §5 |
 | `valid/attachments` | Content-addressed storage resolves; an unreferenced attachment is a GC candidate, not an error. | §7 |
+| `valid/edibles-prerolls` | A `unit: each` edible with `mgPerUnit` and a half-piece `serving`; a mass-based pre-roll with `unitGrams` and an ordinary `amount`; a method with `defaultServing`/`categories`. | §4.1.3, §5.1.1 |
 | `invalid/missing-manifest` | No `manifest.json` — not a CanPUFF vault; readers must refuse rather than guess. | §3.1 |
 | `invalid/bad-manifest` | A manifest whose `format` is not `"canpuff"` is refused. | §3.1 |
 | `invalid/schema-violations` | One violation per record: missing `name`, `cost` without `currency`, missing `at`, `rating` out of range, malformed uuid. | §2, §4.1, §5.1 |
@@ -45,6 +46,7 @@ python3 run-fixtures.py --update        # maintainers: rewrite expected.json aft
 | `invalid/misplaced` | Wrong monthly file for `at`, non-zero-padded month filename, type/directory mismatch, filename ≠ id. | §3 |
 | `invalid/malformed-files` | Unparseable JSONL line; `.md` without/with unterminated frontmatter; non-mapping frontmatter; empty-string `notes`. | §6.1, §6.2 |
 | `invalid/bad-attachments` | Non-hash filename stem, wrong shard directory, content/stem hash mismatch, duplicate stem. | §7 |
+| `invalid/count-supplies` | `grams` on a `unit: each` supply; `quantityStart` without `unit`; an event with both `amount` and `serving`; `serving.value` of 0. Also warns on `amount` against a count-based supply. | §4.1.3, §5.1.1 |
 
 ## Using them to test an implementation
 
