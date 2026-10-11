@@ -1,0 +1,3 @@
+{"type":"consumption","version":1,"id":"e2d1b1e0-0000-4000-8000-000000000101","at":"2026-10-08T19:00:00-07:00","supply":"e2d1b1e0-0000-4000-8000-000000000001","serving":{"unit":"each","value":1},"effects":{"rating":7},"context":{"purpose":"sleep"},"notes":"Light, relaxed by 21:00."}
+{"type":"consumption","version":1,"id":"e2d1b1e0-0000-4000-8000-000000000102","at":"2026-10-09T20:30:00-07:00","supply":"e2d1b1e0-0000-4000-8000-000000000001","serving":{"unit":"each","value":2},"shared":{"people":1},"effects":{"rating":8,"sideEffects":"dry mouth"}}
+{"type":"consumption","version":1,"id":"e2d1b1e0-0000-4000-8000-000000000103","at":"2026-10-10T18:00:00-07:00","supply":"e2d1b1e0-0000-4000-8000-000000000001","serving":{"unit":"each","value":0.5}}

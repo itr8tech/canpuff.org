@@ -1,2 +1,1 @@
 {"type":"consumption","version":1,"id":"e1d1b1e0-0000-4000-8000-000000000011","at":"2026-10-08T19:00:00-07:00","supply":"e1d1b1e0-0000-4000-8000-000000000001","method":"e1d1b1e0-0000-4000-8000-000000000003","serving":{"unit":"each","value":0.5},"effects":{"rating":6}}
-{"type":"consumption","version":1,"id":"e1d1b1e0-0000-4000-8000-000000000012","at":"2026-10-08T21:00:00-07:00","supply":"e1d1b1e0-0000-4000-8000-000000000002","amount":{"grams":0.5},"shared":{"people":1}}

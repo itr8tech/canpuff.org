@@ -1,0 +1,12 @@
+{
+  "verdict": "FAIL",
+  "errors": [
+    "journal/2026/10.jsonl:1: a consumption event must not carry both amount and serving (Edibles §2.3)",
+    "journal/2026/10.jsonl:2: 0 is less than or equal to the minimum of 0 @ serving/value (edibles profile schema)",
+    "catalog/supplies/e1d1b1e0-0000-4000-8000-000000000021.md: grams must be absent when unit is each (Edibles §2.1)",
+    "catalog/supplies/e1d1b1e0-0000-4000-8000-000000000022.md: quantityStart requires unit each (Edibles §2.1)"
+  ],
+  "warnings": [
+    "journal/2026/10.jsonl:1: amount (grams) recorded against a unit-each supply; use serving (Edibles §2.3)"
+  ]
+}

@@ -72,6 +72,29 @@ description: >-
         <span class="grow">Core §2</span></a></li>
     </ul>
 
+    <h3>Profile overlays</h3>
+    <p>
+      A companion profile
+      (<a href="{{ '/canpuff-v1.html#93-companion-profiles' | relative_url }}">Core §9.3</a>)
+      publishes overlay schemas. Validate a record against its core schema
+      <em>and</em> the overlay for its type; an overlay constrains only the fields
+      its profile adds, so a record that does not use them passes it untouched.
+    </p>
+    <ul class="filelist">
+      <li><a href="{{ '/schemas/edibles/v1/supply.json' | relative_url }}">
+        <code>edibles/v1/supply.json</code>
+        <span>Edibles profile: <code>unit</code>, <code>quantity</code>, <code>quantityStart</code> and <code>mgPerUnit</code>.</span>
+        <span class="grow">Edibles §2.1</span></a></li>
+      <li><a href="{{ '/schemas/edibles/v1/consumption.json' | relative_url }}">
+        <code>edibles/v1/consumption.json</code>
+        <span>Edibles profile: <code>serving</code>, a count of pieces in place of <code>amount</code>.</span>
+        <span class="grow">Edibles §2.3</span></a></li>
+      <li><a href="{{ '/schemas/edibles/v1/method.json' | relative_url }}">
+        <code>edibles/v1/method.json</code>
+        <span>Edibles profile: <code>defaultServing</code>.</span>
+        <span class="grow">Edibles §2.4</span></a></li>
+    </ul>
+
     <div class="note">
       <div>
         <b>Validating a whole vault?</b> The schemas cover individual objects.

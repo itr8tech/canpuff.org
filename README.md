@@ -1,6 +1,6 @@
 # CanPUFF — Cannabis Personal Use File Format
 
-**Version 1.0-rc (revised September 24, 2026)** · a release candidate with named cannabinoids in mg/g, optional cannabinoid descriptions, and optional product and purchase details. Record and manifest versions remain `1`; legacy percentage data remains readable.
+**Version 1.0-rc (revised October 10, 2026)** · a release candidate with named cannabinoids in mg/g, optional cannabinoid descriptions, optional product and purchase details, and pre-roll fields. Record and manifest versions remain `1`; legacy percentage data remains readable.
 
 CanPUFF is an open, documented file format for **personal cannabis consumption records** — the data an individual creates when they track what they consume, what they have, where they got it, and how it affected them.
 
@@ -8,14 +8,17 @@ It is a format for *people*, not businesses. Seed-to-sale systems, dispensary po
 
 > **Think "RSS for personal cannabis data":** plain files you own, readable in any text editor, portable between apps, with no account, no API key, and no company that can take them away.
 
+**Scope.** The core format covers cannabis used by **inhalation** (smoking and vaping), recorded by weight. Edibles are deliberately not part of it: they are dosed by the piece and measured in milligrams, and a model stretched to cover both would fit neither well. They have their own companion profile (below), which adds to the same vault without changing the core.
+
 ## The documents
 
 | Document | Status | What it defines |
 |---|---|---|
 | [`canpuff-v1.md`](canpuff-v1.md) | **1.0-rc** | **The core format**: the vault layout, the journal (JSONL events), the catalog (Markdown + frontmatter cards), attachments, identifiers, units, and the extension mechanism. |
 | [`canpuff-sealed-v1.md`](canpuff-sealed-v1.md) | Draft | **The sealed vault profile**: end-to-end encryption (age v1), the key hierarchy (BIP39 mnemonic root), and the synchronization repository layout + protocol for dumb file servers. |
+| [`canpuff-edibles-v1.md`](canpuff-edibles-v1.md) | Draft | **The edibles profile**: counted products dosed in pieces and measured in milligrams, as fields added to core objects. Optional to implement: an application that doesn't simply carries the fields through. It makes an edibles-only application possible on the same vault format. |
 | [`mapping-pufftab-ios.md`](mapping-pufftab-ios.md) | Draft | **Lossless mapping** from the PuffTab iOS app's data model (the first implementation) to CanPUFF, field by field. |
-| [`schemas/`](schemas/) | 1.0-rc | JSON Schema (2020-12) for every object type. The schemas are normative for the JSON form. |
+| [`schemas/`](schemas/) | 1.0-rc | JSON Schema (2020-12) for every object type. The schemas are normative for the JSON form. A companion profile publishes overlay schemas beside them (`schemas/edibles/v1/`). |
 | [`examples/`](examples/) | 1.0-rc | A complete example plain vault, plus standalone JSON objects that validate against the schemas. |
 | [`fixtures/`](fixtures/) | 1.0-rc | **Conformance fixtures**: edge-heavy valid vaults and deliberately broken ones, each with the reference validator's expected verdict, plus a runner. What makes a third-party implementation testable. |
 | [`tools/`](tools/) | 1.0-rc | **Reference tooling**, standalone Python: `validate-vault.py` (conformance) and `diff-vaults.py` (semantic equivalence of two vaults — round-trip verification). Both accept a vault directory or a `.canpuff.zip`. |
@@ -32,6 +35,6 @@ It is a format for *people*, not businesses. Seed-to-sale systems, dispensary po
 
 ## Status & governance
 
-The core format is a **v1.0 release candidate**. The September 23 revision adds cannabinoids, cultivar, lineage, tip, and receipt number within v1 by the format author's decision, superseding the earlier freeze for these changes. Earlier vaults remain readable; older implementations may not safely edit the new fields or catalog type. Future revisions follow Core §10. The sealed profile remains a draft under active development. The spec text and schemas are published under **CC0-1.0**, with an OWFa 1.0 patent non-assertion covering implementations. Two reference implementations exist and round-trip real data losslessly: the PuffTab iOS app (export/import) and the PuffTab web app (import/export); v1.0 **final** follows validation of the sealed profile.
+The core format is a **v1.0 release candidate**. The September 23 revision adds cannabinoids, cultivar, lineage, tip, and receipt number within v1 by the format author's decision, superseding the earlier freeze for these changes. Earlier vaults remain readable; older implementations may not safely edit the new fields or catalog type. Future revisions follow Core §10. The October 8–10 revision adds pre-roll fields, states the core's scope (inhaled cannabis, by weight) and introduces companion profiles; the edibles profile is a draft. The sealed profile remains a draft under active development. The spec text and schemas are published under **CC0-1.0**, with an OWFa 1.0 patent non-assertion covering implementations. Two reference implementations exist and round-trip real data losslessly: the PuffTab iOS app (export/import) and the PuffTab web app (import/export); v1.0 **final** follows validation of the sealed profile.
 
 Feedback, implementations, and proposals are welcome — the extension mechanism is the intended first stop for new needs; fields that prove themselves in `ext` are candidates for the next minor version.

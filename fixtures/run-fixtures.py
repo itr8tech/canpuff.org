@@ -1,12 +1,17 @@
 #!/usr/bin/env python3
 """Run the CanPUFF conformance fixtures against a validator.
 
-Usage:  run-fixtures.py [--validator PATH] [--update] [fixture ...]
+Usage:  run-fixtures.py [--validator PATH] [--profile NAME ...] [--update] [fixture ...]
 
-        fixture          names like valid/tombstones (default: all)
+        fixture          names like valid/tombstones (default: all Core fixtures);
+                         profile fixtures are named edibles/valid/gummies
         --validator PATH a validate-vault.py-compatible tool
                          (default: ../tools/validate-vault.py, run with
                          this same Python interpreter)
+        --profile NAME   also run a companion profile's fixtures (fixtures/NAME/,
+                         e.g. edibles). Core fixtures never depend on a profile,
+                         so a Core-only validator passes them all; profile
+                         fixtures need a validator that implements the profile
         --update         rewrite each expected.json from the validator's
                          actual output — for maintainers after an
                          intentional validator change; review the diff
@@ -51,6 +56,18 @@ def run_validator(validator, target):
         if m:
             (warnings if m.group(1) == "warn" else errors).append(m.group(2))
     return ("PASS" if proc.returncode == 0 else "FAIL"), errors, warnings
+
+
+def discover(profiles):
+    """Fixture names: Core's valid/ and invalid/, plus those of each requested profile."""
+    names = []
+    for prefix in ("", *profiles):
+        for kind in ("valid", "invalid"):
+            base = os.path.join(HERE, prefix, kind)
+            if os.path.isdir(base):
+                names += [f"{prefix + '/' if prefix else ''}{kind}/{name}"
+                          for name in os.listdir(base) if os.path.isdir(os.path.join(base, name))]
+    return sorted(names)
 
 
 def match(expected, actual, problems, category):
@@ -123,6 +140,8 @@ def main():
     ap.add_argument("fixtures", nargs="*", help="e.g. valid/tombstones (default: all)")
     ap.add_argument("--validator",
                     default=os.path.join(HERE, "..", "tools", "validate-vault.py"))
+    ap.add_argument("--profile", action="append", default=[], metavar="NAME",
+                    help="also run a companion profile's fixtures (e.g. edibles)")
     ap.add_argument("--update", action="store_true")
     args = ap.parse_args()
 
@@ -130,11 +149,11 @@ def main():
         print(f"{args.validator}: validator not found", file=sys.stderr)
         return 2
 
-    fixtures = args.fixtures or sorted(
-        f"{kind}/{name}"
-        for kind in ("valid", "invalid") if os.path.isdir(os.path.join(HERE, kind))
-        for name in os.listdir(os.path.join(HERE, kind))
-        if os.path.isdir(os.path.join(HERE, kind, name)))
+    for profile in args.profile:
+        if profile in ("valid", "invalid") or not os.path.isdir(os.path.join(HERE, profile)):
+            print(f"{profile}: no such profile fixture set", file=sys.stderr)
+            return 2
+    fixtures = args.fixtures or discover(args.profile)
     for fixture in fixtures:
         if not os.path.isdir(os.path.join(HERE, fixture, "vault")):
             print(f"{fixture}: no such fixture", file=sys.stderr)

@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """CanPUFF v1 plain-vault validator.
 
-Usage:  validate-vault.py <vault>
+Usage:  validate-vault.py [--core-only] <vault>
         <vault> is a plain-vault directory, or a zipped vault (.canpuff.zip,
         Core §8 — the manifest at the archive root, or inside a sole
         top-level directory).
+        --core-only  check Core alone, as an application that implements no
+                     companion profile would see the vault
 
 Exit codes:
         0  the vault conforms (warnings, if any, are printed)
@@ -17,7 +19,13 @@ Checks a vault against the CanPUFF Core v1 spec: manifest, journal files,
 catalog Markdown round-trip rules, attachment content-addressing, and
 referential integrity. Errors are conformance failures; warnings are
 spec-tolerated conditions worth surfacing (dangling refs, unknown types).
+
+Records that use the fields of a companion profile (Core §9.3) are also
+checked against that profile; today that is the Edibles profile
+(canpuff-edibles-v1.md). A record that uses none of those fields is
+unaffected.
 """
+import argparse
 import contextlib
 import hashlib
 import json
@@ -34,7 +42,9 @@ except ImportError:
     print("validate-vault.py requires: pip install jsonschema pyyaml", file=sys.stderr)
     sys.exit(2)
 
-SCHEMA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "schemas", "v1")
+SCHEMA_ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "schemas")
+SCHEMA_DIR = os.path.join(SCHEMA_ROOT, "v1")
+PROFILES = ("edibles",)          # companion profiles whose overlay schemas and rules apply
 
 TYPE_TO_DIR = {
     "supply": "supplies", "shop": "shops", "chain": "chains", "brand": "brands",
@@ -45,6 +55,7 @@ HASHREF = re.compile(r"sha256:([0-9a-f]{64})")
 
 errors: list[str] = []
 warnings: list[str] = []
+overlays: dict[str, dict] = {}   # profile -> {record type -> overlay schema}; empty with --core-only
 
 
 def err(msg: str) -> None:
@@ -64,27 +75,53 @@ def load_schemas() -> dict:
     return schemas
 
 
-def check_supply_units(obj, where):
-    """Core §5.1.1: category / unit consistency for count-based products."""
+def load_overlays() -> dict:
+    """Companion-profile overlay schemas (Core §9.3): schemas/<profile>/v1/<type>.json."""
+    loaded = {}
+    for profile in PROFILES:
+        directory = os.path.join(SCHEMA_ROOT, profile, "v1")
+        loaded[profile] = {}
+        for name in os.listdir(directory):
+            if name.endswith(".json"):
+                with open(os.path.join(directory, name)) as f:
+                    loaded[profile][name.removesuffix(".json")] = json.load(f)
+    return loaded
+
+
+def check_supply_category(obj, where):
+    """Core §5.1.1: pre-roll fields."""
+    if "unitGrams" in obj and obj.get("category") != "preroll":
+        warn(f"{where}: unitGrams is meaningful only with category preroll (Core §5.1.1)")
+
+
+# --- Edibles profile (canpuff-edibles-v1.md): applied only when profiles are on ---
+
+def check_edible_supply(obj, where):
+    """Edibles §2.1, §2.2: unit / quantity / grams consistency for count-based products."""
     unit = obj.get("unit")
+    cannabinoids = obj.get("cannabinoids") if isinstance(obj.get("cannabinoids"), list) else []
     if unit == "each":
         for field in ("grams", "gramsStart"):
             if field in obj:
-                err(f"{where}: {field} must be absent when unit is each (Core §5.1.1)")
-        for item in obj.get("cannabinoids", []) if isinstance(obj.get("cannabinoids"), list) else []:
+                err(f"{where}: {field} must be absent when unit is each (Edibles §2.1)")
+        for item in cannabinoids:
             if isinstance(item, dict) and any(k.endswith("MgPerGram") for k in item):
-                warn(f"{where}: cannabinoid {item.get('name')!r} uses mg/g readings on a unit-each supply; use mgPerUnit (Core §5.1.1)")
+                warn(f"{where}: cannabinoid {item.get('name')!r} uses mg/g readings on a unit-each supply; use mgPerUnit (Edibles §2.2)")
     else:
         for field in ("quantity", "quantityStart"):
             if field in obj:
-                err(f"{where}: {field} requires unit each (Core §5.1.1)")
-        for item in obj.get("cannabinoids", []) if isinstance(obj.get("cannabinoids"), list) else []:
+                err(f"{where}: {field} requires unit each (Edibles §2.1)")
+        for item in cannabinoids:
             if isinstance(item, dict) and "mgPerUnit" in item:
-                warn(f"{where}: cannabinoid {item.get('name')!r} has mgPerUnit on a mass-based supply (Core §5.1.1)")
+                warn(f"{where}: cannabinoid {item.get('name')!r} has mgPerUnit on a mass-based supply (Edibles §2.2)")
     if obj.get("category") == "edible" and unit != "each":
-        warn(f"{where}: edible supplies SHOULD use unit each (Core §5.1.1)")
-    if "unitGrams" in obj and obj.get("category") != "preroll":
-        warn(f"{where}: unitGrams is meaningful only with category preroll (Core §5.1.1)")
+        warn(f"{where}: edible supplies SHOULD use unit each (Edibles §2.1)")
+
+
+def check_edible_event(obj, where):
+    """Edibles §2.3: an event carries amount or serving, never both."""
+    if "amount" in obj and "serving" in obj:
+        err(f"{where}: a consumption event must not carry both amount and serving (Edibles §2.3)")
 
 
 def validate_object(schemas, type_name, obj, where):
@@ -102,14 +139,25 @@ def validate_object(schemas, type_name, obj, where):
                 err(f"{where}: cannabinoid names must be nonblank and unique ignoring case and surrounding whitespace")
             names.add(name)
     if type_name == "supply":
-        check_supply_units(obj, where)
-    if type_name == "consumption" and "amount" in obj and "serving" in obj:
-        err(f"{where}: a consumption event must not carry both amount and serving (Core §4.1.3)")
+        check_supply_category(obj, where)
+        if overlays:
+            check_edible_supply(obj, where)
+    if type_name == "consumption" and overlays:
+        check_edible_event(obj, where)
     try:
         jsonschema.validate(obj, schema, format_checker=jsonschema.FormatChecker())
     except jsonschema.ValidationError as e:
         loc = "/".join(map(str, e.path))
         err(f"{where}: {e.message}" + (f" @ {loc}" if loc else ""))
+    for profile, by_type in overlays.items():
+        overlay = by_type.get(type_name)
+        if overlay is None:
+            continue
+        try:
+            jsonschema.validate(obj, overlay, format_checker=jsonschema.FormatChecker())
+        except jsonschema.ValidationError as e:
+            loc = "/".join(map(str, e.path))
+            err(f"{where}: {e.message}" + (f" @ {loc}" if loc else "") + f" ({profile} profile schema)")
 
 
 def parse_md(text, where):
@@ -284,13 +332,13 @@ def main(root: str) -> int:
                 if digest != stem:
                     err(f"{rel}: content hash {digest[:12]}… does not match filename")
 
-    # --- event shape vs supply unit (Core §4.1.3) ---
-    for where, supply_id, shape in event_shapes:
+    # --- event shape vs supply unit (Edibles §2.3) ---
+    for where, supply_id, shape in event_shapes if overlays else []:
         unit = supply_units.get(supply_id)
         if unit == "each" and shape == "amount":
-            warn(f"{where}: amount (grams) recorded against a unit-each supply; use serving (Core §4.1.3)")
+            warn(f"{where}: amount (grams) recorded against a unit-each supply; use serving (Edibles §2.3)")
         elif unit == "g" and shape == "serving":
-            warn(f"{where}: serving recorded against a mass-based supply; use amount.grams (Core §4.1.3)")
+            warn(f"{where}: serving recorded against a mass-based supply; use amount.grams (Edibles §2.3)")
 
     # --- referential integrity (dangling = warning by spec) ---
     for where, field, target in refs:
@@ -341,11 +389,15 @@ def vault_root(path):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print(__doc__, file=sys.stderr)
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("vault", help="plain-vault directory or .canpuff.zip")
+    parser.add_argument("--core-only", action="store_true",
+                        help="skip companion-profile checks (what a Core-only application would accept)")
+    args = parser.parse_args()
+    if not os.path.exists(args.vault):
+        print(f"{args.vault}: no such file or directory", file=sys.stderr)
         sys.exit(2)
-    if not os.path.exists(sys.argv[1]):
-        print(f"{sys.argv[1]}: no such file or directory", file=sys.stderr)
-        sys.exit(2)
-    with vault_root(sys.argv[1]) as root:
+    if not args.core_only:
+        overlays.update(load_overlays())
+    with vault_root(args.vault) as root:
         sys.exit(main(root))

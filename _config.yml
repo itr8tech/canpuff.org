@@ -37,11 +37,11 @@ defaults:
       layout: doc
       nav: core
       title: "Core specification"
-      status: "1.0-rc · September 2026 revision"
+      status: "1.0-rc · October 2026 revision"
       description: >-
-        The CanPUFF v1 core format: vault layout, the JSONL journal, Markdown
-        catalog cards, attachments, identifiers, units, import merging, and the
-        extension mechanism.
+        The CanPUFF v1 core format for inhaled cannabis, recorded by weight:
+        vault layout, the JSONL journal, Markdown catalog cards, attachments,
+        identifiers, units, import merging, and the extension mechanism.
   - scope: { path: "canpuff-sealed-v1.md" }
     values:
       layout: doc
@@ -53,6 +53,17 @@ defaults:
         End-to-end encryption for CanPUFF vaults: age v1 envelopes, a BIP39
         mnemonic key hierarchy, and a synchronization protocol for dumb file
         servers.
+  - scope: { path: "canpuff-edibles-v1.md" }
+    values:
+      layout: doc
+      nav: edibles
+      title: "Edibles profile"
+      status: "draft r1"
+      pill: "pill--draft"
+      description: >-
+        Edibles for CanPUFF vaults, kept out of the core on purpose: pieces
+        instead of grams, milligrams per piece, and servings. A companion
+        profile that adds fields to core objects.
   - scope: { path: "mapping-pufftab-ios.md" }
     values:
       layout: doc

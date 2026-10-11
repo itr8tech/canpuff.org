@@ -21,7 +21,7 @@ description: >-
     <ul class="filelist">
       <li><a href="{{ '/tools/validate-vault.py' | relative_url }}">
         <code>validate-vault.py</code>
-        <span>Conformance: manifest, journal files, catalog Markdown round-trip rules, attachment content-addressing, referential integrity.</span>
+        <span>Conformance: manifest, journal files, catalog Markdown round-trip rules, attachment content-addressing, referential integrity, and the Edibles profile where a record uses it.</span>
         <span class="grow">download</span></a></li>
       <li><a href="{{ '/tools/diff-vaults.py' | relative_url }}">
         <code>diff-vaults.py</code>
@@ -34,6 +34,9 @@ description: >-
 <pre><span class="c"># Does this vault conform?</span>
 <span class="dir">python3</span> validate-vault.py my-vault/
 <span class="dir">python3</span> validate-vault.py export.canpuff.zip
+
+<span class="c"># What would an app that implements only the core accept?</span>
+<span class="dir">python3</span> validate-vault.py --core-only my-vault/
 
 <span class="c"># Did the round trip lose anything?</span>
 <span class="dir">python3</span> diff-vaults.py before.canpuff.zip after.canpuff.zip --verify-hashes</pre>

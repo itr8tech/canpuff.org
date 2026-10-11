@@ -5,7 +5,7 @@ nav: home
 
 <section class="hero">
   <div class="wrap">
-    <p class="eyebrow">Open standard · v1.0-rc · September 2026 revision</p>
+    <p class="eyebrow">Open standard · v1.0-rc · October 2026 revision</p>
     <h1>A file format for <span class="gr">personal cannabis records</span>.</h1>
     <p class="lede">
       CanPUFF documents the data an individual creates when they track what they
@@ -70,7 +70,8 @@ nav: home
         <p>
           The vault layout, the journal (JSONL events), the catalog (Markdown +
           YAML frontmatter cards), attachments, identifiers, units, import
-          merging, and the extension mechanism.
+          merging, and the extension mechanism. Scoped to inhaled cannabis,
+          recorded by weight.
         </p>
         <p class="meta">Frozen · 12 sections</p>
       </article>
@@ -87,6 +88,21 @@ nav: home
           server which never sees plaintext.
         </p>
         <p class="meta">Under active development</p>
+      </article>
+
+      <article class="card">
+        <div class="card__top">
+          <h3><a href="{{ '/canpuff-edibles-v1.html' | relative_url }}">Edibles profile</a></h3>
+          <span class="pill pill--draft">draft r1</span>
+        </div>
+        <code>canpuff-edibles-v1.md</code>
+        <p>
+          Edibles, kept out of the core on purpose: pieces instead of grams,
+          milligrams per piece instead of mg/g, servings instead of weighed
+          doses. It adds fields to core objects; an application that ignores it
+          simply carries them through.
+        </p>
+        <p class="meta">Companion profile</p>
       </article>
 
       <article class="card">
@@ -113,7 +129,7 @@ nav: home
           JSON Schema 2020-12 for every object type, served at the canonical
           <code>$id</code> URLs. Normative for the JSON form.
         </p>
-        <p class="meta">11 schemas</p>
+        <p class="meta">12 schemas · 3 profile overlays</p>
       </article>
 
       <article class="card">
@@ -278,6 +294,13 @@ Second time buying — first batch was drier.</pre>
       the earlier freeze for these changes; future revisions follow the
       versioning rules in <a href="{{ '/canpuff-v1.html#10-versioning-of-this-specification' | relative_url }}">Core §10</a>.
       The sealed profile remains a draft, and v1.0 <em>final</em> follows its validation.
+    </p>
+    <p>
+      The October revision states the core's
+      <a href="{{ '/canpuff-v1.html#12-scope' | relative_url }}">scope</a>: cannabis used
+      by inhalation, recorded by weight. Edibles are deliberately not part of it;
+      they have a companion <a href="{{ '/canpuff-edibles-v1.html' | relative_url }}">profile</a>
+      (a draft) that adds to the same vault without changing the core.
     </p>
     <p>
       Spec text and schemas are published under <strong>CC0-1.0</strong>, with an

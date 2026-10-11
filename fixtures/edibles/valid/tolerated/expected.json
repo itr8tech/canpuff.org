@@ -1,0 +1,11 @@
+{
+  "verdict": "PASS",
+  "errors": [],
+  "warnings": [
+    "catalog/supplies/e3d1b1e0-0000-4000-8000-000000000031.md: edible supplies SHOULD use unit each (Edibles §2.1)",
+    "catalog/supplies/e3d1b1e0-0000-4000-8000-000000000032.md: cannabinoid 'THC' has mgPerUnit on a mass-based supply (Edibles §2.2)",
+    "catalog/supplies/e3d1b1e0-0000-4000-8000-000000000033.md: cannabinoid 'THC' uses mg/g readings on a unit-each supply; use mgPerUnit (Edibles §2.2)",
+    "journal/2026/10.jsonl:1: serving recorded against a mass-based supply; use amount.grams (Edibles §2.3)",
+    "journal/2026/10.jsonl:2: amount (grams) recorded against a unit-each supply; use serving (Edibles §2.3)"
+  ]
+}

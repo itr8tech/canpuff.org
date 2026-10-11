@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://canpuff.org/schemas/edibles/v1/method.json",
+  "title": "CanPUFF Edibles profile: method overlay v1",
+  "description": "Overlay. Validate a method against this schema in addition to https://canpuff.org/schemas/v1/method.json. It constrains only defaultServing.",
+  "properties": {
+    "defaultServing": {
+      "type": "object",
+      "properties": {
+        "unit": {
+          "const": "each"
+        },
+        "value": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "pieces, max 2 decimal places"
+        }
+      },
+      "required": [
+        "unit",
+        "value"
+      ],
+      "description": "Typical dose this method implies for count-based supplies."
+    }
+  }
+}

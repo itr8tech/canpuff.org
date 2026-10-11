@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://canpuff.org/schemas/edibles/v1/consumption.json",
+  "title": "CanPUFF Edibles profile: consumption overlay v1",
+  "description": "Overlay. Validate a consumption event against this schema in addition to https://canpuff.org/schemas/v1/consumption.json. It constrains only serving. A writer MUST NOT write both amount and serving; the reference validator checks that.",
+  "properties": {
+    "serving": {
+      "type": "object",
+      "properties": {
+        "unit": {
+          "const": "each"
+        },
+        "value": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "pieces, max 2 decimal places"
+        }
+      },
+      "required": [
+        "unit",
+        "value"
+      ],
+      "description": "Amount consumed of a count-based (unit each) supply, used instead of amount."
+    }
+  }
+}

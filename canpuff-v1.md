@@ -1,6 +1,6 @@
 # CanPUFF: Cannabis Personal Use File Format — Core Specification
 
-**Version 1.0-rc (revised 2026-09-24)** — see the dated v1 revisions for cannabinoids and purchase details below.
+**Version 1.0-rc (revised 2026-10-10)** — see §1.2 for scope, and the dated v1 revisions below for cannabinoids, purchase details and pre-rolls.
 **Media type:** `application/canpuff+json` · **Format identifier:** `canpuff`
 **License:** spec text and schemas CC0-1.0; OWFa 1.0 patent non-assert.
 
@@ -27,6 +27,14 @@ Every record belongs to exactly one of two tiers, and the tier determines its pr
 | **Catalog** | Documents: supplies (what's on hand), shops, chains, brands, producers, methods, tax rates, terpene notes | One Markdown file with YAML frontmatter per record (`.md`) | **Shareable.** Contains no information about the user's behavior. Plaintext by default. |
 
 Sharing features (QR cards, exports to friends, any future federation) MUST only ever transmit catalog records and their referenced attachments — never journal records. An object of a type the reader does not recognize MUST be treated as journal-tier for all privacy rules unless it was read from a vault's `catalog/` directory; sharing features MUST NOT transmit objects of unrecognized type.
+
+### 1.2 Scope
+
+Core describes personal cannabis use by **inhalation**, smoking and vaping, with quantities recorded by weight (grams) and potency by concentration (mg/g). Flower and pre-rolls are in scope, and so are other inhaled products (for example concentrates and vape cartridges), which additive revisions may add.
+
+**Edibles are out of scope for Core**, and so are other ingested and topical products. Their natural units are pieces, millilitres and milligrams rather than grams, and their dosing, onset and duration differ from inhalation. A model stretched to cover both would fit neither well, so Core defines nothing for them.
+
+Other uses are served by **companion profiles** (§9.3): separate documents that add fields to Core objects without changing what Core means. The first is [CanPUFF Edibles](canpuff-edibles-v1.md) (Draft). An application that implements only Core is conforming, and it preserves a profile's fields when it round-trips a record (§2).
 
 ## 2. Common requirements for all objects
 
@@ -171,23 +179,6 @@ thcUnits = userGrams × thcMgPerGram / 5
 
 This value is derived and MUST NOT be stored as an authoritative field.
 
-### 4.1.3 Count-based servings (edibles and similar)
-
-For a supply with `unit: each` (§5.1.1) the dose is a number of pieces, not grams. The event records it as `serving` instead of `amount`:
-
-```json
-{ "type": "consumption", "version": 1, "id": "…", "at": "2026-10-08T19:00:00-07:00",
-  "supply": "…", "method": "…", "serving": { "unit": "each", "value": 0.5 } }
-```
-
-- `serving.value` is a number of pieces greater than 0, at most two decimal places (half and quarter pieces are normal). `serving.unit` is `each`.
-- A writer MUST NOT write both `amount` and `serving` on one event. A reader that finds both MUST treat the event as invalid; a validator reports an error.
-- Writing `serving` and omitting `amount` is deliberate: readers that predate this revision see an event with no `amount`, which §4.1.1 already defines as contributing 0 grams. Such readers neither reject nor corrupt the event, and they MUST preserve the unknown field (§2).
-- **Math.** §4.1.1 applies unchanged with pieces in place of grams: `userServing = shared.gift ? (supply.sharedSupply ? serving.value : 0) : serving.value / persons`.
-- **Depletion.** A writer SHOULD decrement the supply's `quantity` by `serving.value` (floored at 0), reversing it on edit or delete, exactly as for `grams` in §4.1.
-- **THC.** `thcMg = userServing × mgPerUnit` for the THC entry; `thcUnits = thcMg / 5`. Derived; never stored.
-- A `serving` against a mass-based supply, or an `amount` against a `unit: each` supply, is a warning, not an error: the event is preserved and its dose is simply not computable.
-
 ### 4.2 Other journal event types
 
 This version defines only `consumption`. Applications needing additional event kinds (e.g. supply adjustments, tolerance-break markers) MUST use extension types (§9.1) until they are standardized.
@@ -248,25 +239,21 @@ User interfaces SHOULD label `variety` as **Type** and offer **Not specified** f
 
 User interfaces SHOULD label `cultivar` as **Cultivar / strain**, keep it and **Lineage** optional alongside other product identity fields, and may use `Parent A × Parent B` as the lineage input hint. `name` is the primary product/supply identifier; consumers MUST NOT require users to repeat it as `cultivar`. These fields record supplied descriptions, not verified genetic identity. Neither parentage, retail category, nor cannabinoid concentrations should be inferred from a product or cultivar name.
 
-### 5.1.1 Product category and unit
+### 5.1.1 Product category and pre-rolls
 
-Supplies are mass-based by default. Three optional fields describe other products without disturbing that default:
+Supplies are mass-based: `grams` and `gramsStart` are the quantity (§5.1). Three optional fields say what kind of product a supply is:
 
 | Field | Type | Meaning |
 |---|---|---|
-| `category` | string | OPTIONAL. `flower`, `preroll` or `edible`. Absent means **Not specified**; readers MUST NOT substitute `flower`. Readers MUST tolerate (and preserve) values added by later revisions. |
-| `format` | string | OPTIONAL free text, e.g. "gummy", "chocolate", "capsule". |
-| `unit` | string | OPTIONAL. `g` (default) or `each`. |
-| `quantity`, `quantityStart` | number | Pieces remaining and at acquisition; at most two decimal places. Used **only** with `unit: each`. |
+| `category` | string | OPTIONAL. `flower` or `preroll`. Absent means **Not specified**; readers MUST NOT substitute `flower`. Companion profiles (§9.3) and later revisions define further values; readers MUST tolerate (and preserve) values they do not recognize. |
+| `format` | string | OPTIONAL free text, e.g. "joint", "cone", "infused pre-roll". |
 | `unitGrams` | grams | Grams per individual pre-roll. |
 
 Rules:
 
-- With `unit: each`, `grams` and `gramsStart` MUST be absent (one source of truth) and `quantity` is authoritative on the same terms as `grams` (§5.1). Without it, `quantity` and `quantityStart` MUST be absent.
-- With `unit: each`, potency uses `cannabinoids[].mgPerUnit` (mg per piece, 0–10000, at most four decimal places). The as-sold/total split does not apply: infused products are already activated. Missing means unknown, not zero; an explicit zero is a reading. Package total is `mgPerUnit × quantityStart`, derived and never stored. Edibles SHOULD use `unit: each`; mg/g readings on a count-based supply, and `mgPerUnit` on a mass-based one, are warnings.
-- A **pre-roll** stays mass-based: `grams` and `gramsStart` hold the total weight, `unitGrams` the weight of one. Pieces remaining is `grams / unitGrams`, derived and never stored. Potency uses the ordinary mg/g readings, so §4.1.1 and §4.1.2 apply with no change.
+- A **pre-roll** is mass-based: `grams` and `gramsStart` hold the total weight, `unitGrams` the weight of one. Pieces remaining is `grams / unitGrams`, derived and never stored. Potency uses the ordinary mg/g readings, so §4.1.1 and §4.1.2 apply with no change.
 - `unitGrams` is meaningful only with `category: preroll`.
-- A `method` MAY carry `defaultServing` (`{ "unit": "each", "value": n }`, the typical dose it implies for count-based supplies) and `categories` (an array of category strings it applies to; absent or empty means any). Both are hints for user interfaces.
+- A `method` MAY carry `categories`, an array of category strings it applies to (absent or empty means any). It is a hint for user interfaces.
 
 Derived values (`costPerGram = (cost + tip) / gramsStart`, cost with taxes, freshness) MUST NOT be stored; the formulas above and the referenced `tax-rate` records make them reproducible.
 
@@ -411,6 +398,16 @@ Extension **journal event types** use the same identifiers, dotted: `"type": "<a
 
 Whole-file application data (settings, caches, app-specific histories) lives under `apps/<app-id>/` in whatever format the application chooses. Other applications MUST NOT interpret it but MUST carry it through export/import intact. On import, for each `apps/<app-id>/` path present on both sides: the importing application, if it owns `<app-id>`, applies its own merge; otherwise the local file is kept and the incoming file is discarded (or preserved under a conflict name). Paths present only in the import are copied. Data in `apps/` is journal-tier for the purposes of the Sealed profile (encrypted off-device) unless the owning app documents otherwise.
 
+### 9.3 Companion profiles
+
+A **companion profile** is a separate, versioned document for a use that Core does not cover (§1.2). [CanPUFF Sealed](canpuff-sealed-v1.md) defines the encrypted form of a vault; [CanPUFF Edibles](canpuff-edibles-v1.md) defines count-dosed products.
+
+- A profile adds no object types to the closed set in §5 and does not change the meaning of any Core field. It may add fields to Core objects.
+- A reader that does not implement a profile treats its fields like any other unknown field: it ignores them and preserves them on write-back (§2).
+- A profile that publishes JSON Schemas publishes them as overlays. A record validates against its Core schema and against the profile's overlay for its type.
+- A profile differs from `ext` (§9.1): `ext` belongs to one application, while a profile is published, so any number of applications can implement it and interoperate.
+- The manifest has no way to declare a profile in this version. A reader recognizes a profile's use by its fields.
+
 ## 10. Versioning of this specification
 
 - **Minor revisions** (1.1, 1.2 …) may add fields and object types. They MUST NOT change the meaning of existing fields. The `specVersion` in the manifest stays `1`; object `version` values stay `1` unless an object type itself is revised.
@@ -452,6 +449,10 @@ Supplies MAY contain `receiptNumber`, optional text preserving leading zeroes an
 
 The optional cannabinoid `description` field documented above is separate from notes and supply concentrations. It retains version 1. The suggested THC/CBD full names follow [Health Canada's terminology](https://www.canada.ca/en/health-canada/services/drugs-medication/cannabis/about.html).
 
-### October 8, 2026 v1 addition: edibles and pre-rolls
+### October 8, 2026 v1 addition: pre-rolls and product categories
 
-Additive; record `version: 1` and manifest `specVersion: 1` are unchanged. Adds supply `category`, `format`, `unit`, `quantity`, `quantityStart`, `unitGrams`; cannabinoid `mgPerUnit`; consumption `serving`; method `defaultServing` and `categories` (§4.1.3, §5.1.1). Vaults written before this revision remain valid and mean exactly what they did. Earlier implementations should carry the new fields through unread (§2) but cannot compute or edit count-based doses; an edible logged by a newer app appears to them as an event with no amount. The category and unit sets are intentionally small; further product kinds (vapes, concentrates, beverages, oils, topicals) will extend them in later additive revisions.
+Additive; record `version: 1` and manifest `specVersion: 1` are unchanged. Adds supply `category`, `format` and `unitGrams`, and method `categories` (§5.1.1). Vaults written before this revision remain valid and mean exactly what they did. The category set is intentionally small and open: readers tolerate and preserve values they do not know.
+
+### October 10, 2026 v1 revision: scope, and edibles as a companion profile
+
+Core now states its scope (§1.2): inhaled cannabis, recorded by weight. The same October 8 revision had also defined count-based fields for edibles in this document (supply `unit`, `quantity`, `quantityStart` and `category: edible`; cannabinoid `mgPerUnit`; consumption `serving`; method `defaultServing`, with their math in what was §4.1.3). Those moved, with their wire format unchanged, to the [CanPUFF Edibles profile](canpuff-edibles-v1.md), and §9.3 describes companion profiles. Nothing was removed from any vault: a vault written against the October 8 text is valid under Core plus the profile, and means what it meant. A Core-only application ignores the fields, preserves them, and sees an edible dose as an event with no amount.

@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://canpuff.org/schemas/edibles/v1/supply.json",
+  "title": "CanPUFF Edibles profile: supply overlay v1",
+  "description": "Overlay. Validate a supply against this schema in addition to https://canpuff.org/schemas/v1/supply.json. It constrains only the fields the Edibles profile adds; a supply that does not use them passes unchanged. Cross-field rules (grams absent with unit each, quantity only with unit each) are in the profile and the reference validator.",
+  "properties": {
+    "unit": {
+      "enum": [
+        "g",
+        "each"
+      ],
+      "description": "Measurement basis of the package. Absent or g: grams/gramsStart are the quantity. each: quantity/quantityStart count pieces and grams/gramsStart MUST be absent."
+    },
+    "quantity": {
+      "type": "number",
+      "minimum": 0,
+      "description": "pieces, max 2 decimal places (partial pieces are allowed). Used only when unit is each."
+    },
+    "quantityStart": {
+      "type": "number",
+      "minimum": 0,
+      "description": "pieces, max 2 decimal places (partial pieces are allowed). Used only when unit is each."
+    },
+    "cannabinoids": {
+      "items": {
+        "properties": {
+          "mgPerUnit": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 10000,
+            "description": "mg per piece for count-based (unit each) products; at most four decimal places. Infused products are already activated, so there is no as-sold/total split."
+          }
+        }
+      }
+    }
+  }
+}

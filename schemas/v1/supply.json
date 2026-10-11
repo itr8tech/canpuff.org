@@ -164,12 +164,6 @@
           },
           "originalUnspecifiedMgPerGram": {
             "$ref": "#/$defs/concentration"
-          },
-          "mgPerUnit": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 10000,
-            "description": "mg per piece for count-based (unit each) products; at most four decimal places. Infused products are already activated, so there is no as-sold/total split."
           }
         },
         "required": [
@@ -182,33 +176,17 @@
       "description": "Purchase receipt identifier; preserve leading zeroes. Private purchase metadata."
     },
     "category": {
-      "enum": [
+      "type": "string",
+      "minLength": 1,
+      "examples": [
         "flower",
-        "preroll",
-        "edible"
+        "preroll"
       ],
-      "description": "Optional product category. Absent means Not specified (treated as mass-based, never assumed flower in the UI). Readers MUST tolerate values added by later revisions."
+      "description": "Optional product category. Core defines flower and preroll; companion profiles and later revisions define others, and readers MUST tolerate and preserve values they do not recognize. Absent means Not specified (never assumed flower)."
     },
     "format": {
       "type": "string",
-      "description": "Optional free-text product form, e.g. gummy, chocolate, hard candy, capsule, joint, infused pre-roll."
-    },
-    "unit": {
-      "enum": [
-        "g",
-        "each"
-      ],
-      "description": "Measurement basis of the package. Absent or g: grams/gramsStart are the quantity. each: quantity/quantityStart count pieces and grams/gramsStart MUST be absent."
-    },
-    "quantity": {
-      "type": "number",
-      "minimum": 0,
-      "description": "pieces, max 2 decimal places (partial pieces are allowed). Used only when unit is each."
-    },
-    "quantityStart": {
-      "type": "number",
-      "minimum": 0,
-      "description": "pieces, max 2 decimal places (partial pieces are allowed). Used only when unit is each."
+      "description": "Optional free-text product form, e.g. joint, cone, infused pre-roll."
     },
     "unitGrams": {
       "$ref": "#/$defs/grams",
