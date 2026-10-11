@@ -4,7 +4,7 @@
 
 This profile defines how a CanPUFF vault records **edibles**: cannabis products that are eaten, counted in pieces, and measured in milligrams, rather than inhaled and weighed (Core §1.2). It adds fields to existing Core objects. It adds no object types, no directories and no files.
 
-Implementing this profile is OPTIONAL. Its fields are ordinary unknown fields to a Core reader, which ignores them and preserves them on write-back (Core §2). To such a reader an edible dose is a consumption event with no amount, which contributes 0 grams (Core §4.1.1): nothing breaks, and nothing is counted.
+Implementing this profile is OPTIONAL, and no application implements it yet; it is published so that one can. Its fields are ordinary unknown fields to a Core reader, which ignores them and preserves them on write-back (Core §2). To such a reader an edible dose is a consumption event with no amount, which contributes 0 grams (Core §4.1.1): nothing breaks, and nothing is counted.
 
 The key words MUST, MUST NOT, REQUIRED, SHALL, SHALL NOT, SHOULD, SHOULD NOT, RECOMMENDED, NOT RECOMMENDED, MAY, and OPTIONAL in this document are to be interpreted as described in BCP 14 (RFC 2119, RFC 8174) when, and only when, they appear in all capitals.
 

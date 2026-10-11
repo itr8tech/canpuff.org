@@ -186,18 +186,14 @@ The native Type picker and the PWA Type selector edit the same optional `variety
 
 The optional native `Cannabinoid.descriptionText` maps to `cannabinoid.description`; notes remain separate. An absent description may use the default full names for THC/CBD. Unlike the general empty-string omission rule, an explicitly cleared description exports as `description: ""` to preserve that choice.
 
-## October 8–10, 2026 pre-rolls and edibles
+## October 8–10, 2026 pre-rolls
 
-Maps the pre-roll fields of Core §5.1.1 and the fields of the [Edibles profile](canpuff-edibles-v1.md) §2, which the app implements. Flower writes none of them, so existing vaults and exports are byte-identical. The first three rows are Core; the rest are the Edibles profile, and an importer that implements only Core ignores them and keeps them (Core §2).
+Maps the pre-roll fields of Core §5.1.1. Flower writes none of them, so existing vaults and exports are byte-identical.
 
 | iOS | CanPUFF |
 |---|---|
-| `Supply.categoryRaw` | `category` (Core §5.1.1; the value `edible` is the Edibles profile's). Written verbatim when non-empty and read back verbatim, so a category from a later revision survives a round trip. The app treats an unrecognised value as flower for display only. |
-| `Supply.formatText` | `format` (Core §5.1.1) |
-| `Supply.unitGrams` | `unitGrams` (Core §5.1.1; pre-rolls: the supply stays mass-based and keeps `grams`/`gramsStart`) |
-| `Supply.unitRaw` (`"each"`) | `unit: each` (Edibles §2.1); absent otherwise |
-| `Supply.quantity`, `quantityStart` | `quantity`, `quantityStart` (Edibles §2.1; 2 dp, exact value in `ext.pufftab["exact.quantity"]` when rounding was lossy). With `unit: each`, `grams` and `gramsStart` are **not written**; `Supply.grams` and `gramsstart` stay 0 in the app. |
-| `SupplyCannabinoid.mgPerUnit` | `cannabinoids[].mgPerUnit` (Edibles §2.2) |
-| `Puff.servings` (> 0) | `serving: { "unit": "each", "value": n }` (Edibles §2.3). `amount` is **not written**, and `Puff.grams` stays 0. Exact value in `exact.servings` when rounding was lossy. |
+| `Supply.categoryRaw` | `category` (Core §5.1.1). Written verbatim when non-empty and read back verbatim, so a category from a later revision survives a round trip. The app treats an unrecognised value as flower for display only. |
+| `Supply.formatText` | `format` |
+| `Supply.unitGrams` | `unitGrams` (pre-rolls: the supply stays mass-based and keeps `grams`/`gramsStart`) |
 
-Counted doses live in their own fields rather than reusing `grams`: every gram-based total, daily limit, widget and Watch figure then ignores them instead of miscounting. Gram-based totals deliberately exclude edibles for now.
+**Edibles.** PuffTab does not track edibles, so it does not implement the [Edibles profile](canpuff-edibles-v1.md). On import, a supply with `category: edible` or `unit: each` is skipped, and so is every consumption event that carries `serving` or points at such a supply. Nothing is converted to grams, and the import summary reports how many supplies and doses were skipped. Skipped records are not kept, so a vault that PuffTab exports afterwards no longer contains them.
